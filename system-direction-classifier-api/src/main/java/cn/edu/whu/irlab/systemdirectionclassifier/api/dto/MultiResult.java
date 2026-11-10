@@ -1,4 +1,4 @@
-package org.ylzl.eden.demo.api.dto;
+package cn.edu.whu.irlab.systemdirectionclassifier.api.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

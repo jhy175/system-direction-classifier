@@ -72,4 +72,4 @@ fi
 
 JAVA_OPTS="${JAVA_OPTS} -Dserver.port=${SERVER_PORT} -Dmanagement.server.port=${MANAGEMENT_SERVER_PORT}"
 
-exec java ${JAVA_OPTS} -noverify -Djava.security.egd=file:/dev/./urandom -cp /app/resources/:/app/classes/:/app/libs/* "org.ylzl.eden.demo.LayerApplication" "$@"
+exec java ${JAVA_OPTS} -noverify -Djava.security.egd=file:/dev/./urandom -cp /app/resources/:/app/classes/:/app/libs/* "cn.edu.whu.irlab.systemdirectionclassifier.SystemDirectionClassifierApplication" "$@"

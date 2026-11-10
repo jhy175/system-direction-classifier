@@ -1,8 +1,8 @@
-package org.ylzl.eden.demo.service.converter;
+package cn.edu.whu.irlab.systemdirectionclassifier.service.converter;
 
-import org.ylzl.eden.demo.api.dto.UserRequestDTO;
-import org.ylzl.eden.demo.api.dto.UserResponseDTO;
-import org.ylzl.eden.demo.dao.database.dataobject.UserDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.UserRequestDTO;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.UserResponseDTO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.UserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;

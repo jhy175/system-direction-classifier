@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.manager.mq;
+package cn.edu.whu.irlab.systemdirectionclassifier.manager.mq;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

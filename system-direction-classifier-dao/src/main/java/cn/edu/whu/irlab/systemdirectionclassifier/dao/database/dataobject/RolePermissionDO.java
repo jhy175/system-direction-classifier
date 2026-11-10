@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.dao.database.dataobject;
+package cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

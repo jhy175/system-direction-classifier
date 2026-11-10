@@ -1,12 +1,12 @@
-package org.ylzl.eden.demo.dao.impl;
+package cn.edu.whu.irlab.systemdirectionclassifier.dao.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.RequiredArgsConstructor;
-import org.ylzl.eden.demo.api.dto.UserPageQuery;
-import org.ylzl.eden.demo.dao.UserDAO;
-import org.ylzl.eden.demo.dao.database.dataobject.UserDO;
-import org.ylzl.eden.demo.dao.database.mapper.UserMapper;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.UserPageQuery;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.UserDAO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.UserDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.mapper.UserMapper;
 import org.springframework.stereotype.Repository;
 
 /**

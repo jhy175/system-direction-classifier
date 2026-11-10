@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.manager.dao;
+package cn.edu.whu.irlab.systemdirectionclassifier.manager.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.ylzl.eden.demo.dao.*;
-import org.ylzl.eden.demo.dao.database.dataobject.MenuDO;
-import org.ylzl.eden.demo.dao.database.dataobject.PermissionDO;
-import org.ylzl.eden.demo.dao.database.dataobject.RoleDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.*;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.MenuDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.PermissionDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.RoleDO;
 
 import java.util.ArrayList;
 import java.util.HashSet;

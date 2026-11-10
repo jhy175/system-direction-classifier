@@ -21,7 +21,7 @@ Apache Dubbo 是阿里巴巴开源的高性能 RPC 框架，本项目集成 Dubb
 dubbo:
   enabled: true # 开关，请不要使用 @EnabledDubbo 原生注解，否则无法关闭
   scan:
-    base-packages: org.ylzl.eden.demo.service # Dubbo 服务扫描
+    base-packages: cn.edu.whu.irlab.systemdirectionclassifier.service # Dubbo 服务扫描
   application:
     id: ${spring.application.name}
     name: ${spring.application.name}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.config;
+package cn.edu.whu.irlab.systemdirectionclassifier.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

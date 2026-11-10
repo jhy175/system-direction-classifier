@@ -1,8 +1,8 @@
-package org.ylzl.eden.demo.dao;
+package cn.edu.whu.irlab.systemdirectionclassifier.dao;
 
 import com.github.pagehelper.Page;
-import org.ylzl.eden.demo.api.dto.UserPageQuery;
-import org.ylzl.eden.demo.dao.database.dataobject.UserDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.UserPageQuery;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.UserDO;
 
 /**
  * 用户（数据对象）存储访问接口

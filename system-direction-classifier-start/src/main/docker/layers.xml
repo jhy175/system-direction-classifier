@@ -13,7 +13,7 @@
 			<include>*:*:*SNAPSHOT</include>
 		</into>
 		<into layer="modules-dependencies">
-			<include>org.ylzl.eden.demo:*:*</include>
+			<include>cn.edu.whu.irlab.systemdirectionclassifier:*:*</include>
 		</into>
 		<into layer="organization-dependencies">
 			<include>org.ylzl*:*:*</include>

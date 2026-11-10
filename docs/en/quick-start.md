@@ -22,8 +22,8 @@ Layered Architecture is a data-model oriented architectural style recommended by
 ### Clone Project
 
 ```bash
-git clone https://github.com/shiyindaxiaojie/eden-demo-layer.git
-cd eden-demo-layer
+git clone https://github.com/jhy175/system-direction-classifier.git
+cd system-direction-classifier
 ```
 
 ### Build Project
@@ -34,17 +34,17 @@ git clone https://github.com/shiyindaxiaojie/eden-architect.git
 cd eden-architect && mvn install -T 4C -DskipTests
 
 # Build this project
-cd eden-demo-layer && mvn install -T 4C -DskipTests
+cd system-direction-classifier && mvn install -T 4C -DskipTests
 ```
 
 ### Start Application
 
 ```bash
-cd eden-demo-layer-start
+cd system-direction-classifier-start
 mvn spring-boot:run
 ```
 
-Or run `LayerApplication.java` directly.
+Or run `SystemDirectionClassifierApplication.java` directly.
 
 ### Verify Startup
 

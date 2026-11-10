@@ -1,12 +1,12 @@
-package org.ylzl.eden.demo.service.converter;
+package cn.edu.whu.irlab.systemdirectionclassifier.service.converter;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.ylzl.eden.demo.api.dto.RoleRequestDTO;
-import org.ylzl.eden.demo.api.dto.RoleResponseDTO;
-import org.ylzl.eden.demo.dao.database.dataobject.RoleDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.RoleRequestDTO;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.RoleResponseDTO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.RoleDO;
 
 import java.util.List;
 

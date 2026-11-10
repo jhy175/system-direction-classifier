@@ -17,10 +17,10 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.ylzl.eden.demo.dao.database.mapper.UserMapper">
+<mapper namespace="cn.edu.whu.irlab.systemdirectionclassifier.dao.database.mapper.UserMapper">
 
 	<resultMap id="dbResultMap"
-			   type="org.ylzl.eden.demo.dao.database.dataobject.UserDO">
+			   type="cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.UserDO">
 		<result column="id" property="id"/>
 		<result column="login" property="login"/>
 		<result column="email" property="email"/>

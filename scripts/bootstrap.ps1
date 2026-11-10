@@ -36,7 +36,7 @@ try {
         if ($actualCommit -ne $edenCommit) { throw "Expected Eden commit $edenCommit, got $actualCommit" }
         # Read only the demo root and its direct module POMs, excluding downloaded tools.
         $pomFiles = @(Get-Item (Join-Path $projectRoot 'pom.xml'))
-        $pomFiles += Get-ChildItem $projectRoot -Directory -Filter 'eden-demo-layer-*' |
+        $pomFiles += Get-ChildItem $projectRoot -Directory -Filter 'system-direction-classifier-*' |
             ForEach-Object { Get-Item (Join-Path $_.FullName 'pom.xml') }
         $artifacts = foreach ($pomFile in $pomFiles) {
             [xml]$pom = Get-Content -LiteralPath $pomFile.FullName -Raw

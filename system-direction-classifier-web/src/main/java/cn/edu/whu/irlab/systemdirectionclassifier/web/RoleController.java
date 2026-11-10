@@ -1,12 +1,12 @@
-package org.ylzl.eden.demo.web;
+package cn.edu.whu.irlab.systemdirectionclassifier.web;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.ylzl.eden.demo.api.RoleService;
-import org.ylzl.eden.demo.api.dto.*;
-import org.ylzl.eden.demo.web.constant.API;
-import org.ylzl.eden.demo.api.dto.MultiResult;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.RoleService;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.*;
+import cn.edu.whu.irlab.systemdirectionclassifier.web.constant.API;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.MultiResult;
 import org.ylzl.eden.spring.framework.dto.PageResult;
 import org.ylzl.eden.spring.framework.dto.Result;
 import org.ylzl.eden.spring.framework.dto.SingleResult;

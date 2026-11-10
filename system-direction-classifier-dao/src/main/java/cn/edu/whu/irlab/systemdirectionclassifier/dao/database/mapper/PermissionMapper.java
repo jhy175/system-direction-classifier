@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.dao.database.mapper;
+package cn.edu.whu.irlab.systemdirectionclassifier.dao.database.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.ylzl.eden.demo.dao.database.dataobject.PermissionDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.PermissionDO;
 
 import java.util.List;
 

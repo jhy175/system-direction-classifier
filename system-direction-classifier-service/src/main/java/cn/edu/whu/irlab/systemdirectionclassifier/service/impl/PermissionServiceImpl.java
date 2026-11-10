@@ -1,17 +1,17 @@
-package org.ylzl.eden.demo.service.impl;
+package cn.edu.whu.irlab.systemdirectionclassifier.service.impl;
 
 import com.github.pagehelper.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.ylzl.eden.demo.api.PermissionService;
-import org.ylzl.eden.demo.api.dto.*;
-import org.ylzl.eden.demo.dao.PermissionDAO;
-import org.ylzl.eden.demo.dao.database.dataobject.PermissionDO;
-import org.ylzl.eden.demo.manager.dao.RbacManager;
-import org.ylzl.eden.demo.service.converter.PermissionConvertor;
-import org.ylzl.eden.demo.api.dto.MultiResult;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.PermissionService;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.*;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.PermissionDAO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.PermissionDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.manager.dao.RbacManager;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.converter.PermissionConvertor;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.MultiResult;
 import org.ylzl.eden.spring.framework.dto.PageResult;
 import org.ylzl.eden.spring.framework.dto.Result;
 import org.ylzl.eden.spring.framework.dto.SingleResult;

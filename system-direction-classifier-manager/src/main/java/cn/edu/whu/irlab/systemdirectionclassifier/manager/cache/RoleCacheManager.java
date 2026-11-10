@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.manager.cache;
+package cn.edu.whu.irlab.systemdirectionclassifier.manager.cache;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import org.ylzl.eden.demo.dao.database.dataobject.PermissionDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.PermissionDO;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

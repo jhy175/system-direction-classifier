@@ -1,7 +1,7 @@
 dubbo:
   enabled: true # 开关，请不要使用 @EnabledDubbo 原生注解，否则无法关闭
   scan:
-    base-packages: org.ylzl.eden.demo.adapter # Dubbo 服务扫描
+    base-packages: cn.edu.whu.irlab.systemdirectionclassifier.adapter # Dubbo 服务扫描
   application:
     id: ${spring.application.name}
     name: ${spring.application.name}

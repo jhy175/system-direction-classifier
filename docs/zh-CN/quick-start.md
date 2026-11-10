@@ -22,8 +22,8 @@
 ### 克隆项目
 
 ```bash
-git clone https://github.com/shiyindaxiaojie/eden-demo-layer.git
-cd eden-demo-layer
+git clone https://github.com/jhy175/system-direction-classifier.git
+cd system-direction-classifier
 ```
 
 ### 构建项目
@@ -34,17 +34,17 @@ git clone https://github.com/shiyindaxiaojie/eden-architect.git
 cd eden-architect && mvn install -T 4C -DskipTests
 
 # 构建本项目
-cd eden-demo-layer && mvn install -T 4C -DskipTests
+cd system-direction-classifier && mvn install -T 4C -DskipTests
 ```
 
 ### 启动应用
 
 ```bash
-cd eden-demo-layer-start
+cd system-direction-classifier-start
 mvn spring-boot:run
 ```
 
-或者直接运行 `LayerApplication.java` 启动类。
+或者直接运行 `SystemDirectionClassifierApplication.java` 启动类。
 
 ### 验证启动
 

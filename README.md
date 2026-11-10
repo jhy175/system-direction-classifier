@@ -2,10 +2,10 @@
 
 # Layered Architecture
 
-[![](https://cdn.jsdelivr.net/gh/shiyindaxiaojie/cdn/readme/language-java-blue.svg)](https://github.com/shiyindaxiaojie/eden-demo-layer)
-[![Build Status](https://github.com/shiyindaxiaojie/eden-demo-layer/actions/workflows/maven-ci.yml/badge.svg?branch=main)](https://github.com/shiyindaxiaojie/eden-demo-layer/actions)
+[![](https://cdn.jsdelivr.net/gh/shiyindaxiaojie/cdn/readme/language-java-blue.svg)](https://github.com/jhy175/system-direction-classifier)
+[![Build Status](https://github.com/jhy175/system-direction-classifier/actions/workflows/maven-ci.yml/badge.svg?branch=main)](https://github.com/jhy175/system-direction-classifier/actions)
 [![License](https://cdn.jsdelivr.net/gh/shiyindaxiaojie/cdn/readme/license-apache2.0-red.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=shiyindaxiaojie_eden-demo-layer&metric=alert_status)](https://sonarcloud.io/dashboard?id=shiyindaxiaojie_eden-demo-layer)
+[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=shiyindaxiaojie_system-direction-classifier&metric=alert_status)](https://sonarcloud.io/dashboard?id=shiyindaxiaojie_system-direction-classifier)
 
 <p>
   <strong>Classic Data-Model Oriented Layered Application Architecture</strong>
@@ -51,12 +51,12 @@ flowchart TB
     end
 
     %% Layered Architecture Core Components
-    WEB["«Web Layer»<br/>eden-demo-layer-web"]
-    START["«Bootstrap»<br/>eden-demo-layer-start"]
-    SERVICE["«Service Layer»<br/>eden-demo-layer-service"]
-    API["«API Layer»<br/>eden-demo-layer-api"]
-    MANAGER["«Manager Layer»<br/>eden-demo-layer-manager"]
-    DAO["«DAO Layer»<br/>eden-demo-layer-dao"]
+    WEB["«Web Layer»<br/>system-direction-classifier-web"]
+    START["«Bootstrap»<br/>system-direction-classifier-start"]
+    SERVICE["«Service Layer»<br/>system-direction-classifier-service"]
+    API["«API Layer»<br/>system-direction-classifier-api"]
+    MANAGER["«Manager Layer»<br/>system-direction-classifier-manager"]
+    DAO["«DAO Layer»<br/>system-direction-classifier-dao"]
 
     %% Interface Nodes
     rpc((rpc))
@@ -121,12 +121,12 @@ flowchart TB
     style http fill:#fff,stroke:#333
 ```
 
-* **eden-demo-layer-web**: Web Layer. Handles request forwarding, parameter validation, and simple non-reusable business logic.
-* **eden-demo-layer-service**: Service Layer. Core business logic implementation.
-* **eden-demo-layer-api**: API Layer. Exports interfaces as a `jar` package (DTOs, Service interfaces).
-* **eden-demo-layer-manager**: Manager Layer. Common business processing layer for third-party integrations, common service capabilities (caching, middleware), and DAO composition/reuse.
-* **eden-demo-layer-dao**: DAO Layer. Data persistence layer interacting with `MySQL`, `Elasticsearch`, `MongoDB`, etc.
-* **eden-demo-layer-start**: Application bootstrap entry, unified management of application configuration and delivery.
+* **system-direction-classifier-web**: Web Layer. Handles request forwarding, parameter validation, and simple non-reusable business logic.
+* **system-direction-classifier-service**: Service Layer. Core business logic implementation.
+* **system-direction-classifier-api**: API Layer. Exports interfaces as a `jar` package (DTOs, Service interfaces).
+* **system-direction-classifier-manager**: Manager Layer. Common business processing layer for third-party integrations, common service capabilities (caching, middleware), and DAO composition/reuse.
+* **system-direction-classifier-dao**: DAO Layer. Data persistence layer interacting with `MySQL`, `Elasticsearch`, `MongoDB`, etc.
+* **system-direction-classifier-start**: Application bootstrap entry, unified management of application configuration and delivery.
 
 ## Runtime Flow
 
@@ -166,10 +166,10 @@ sequenceDiagram
         participant A as Active Adapter
     end
     box rgb(144,238,144,0.3) Layered Application Architecture
-        participant B as eden-demo-layer-web
-        participant C as eden-demo-layer-service
-        participant D as eden-demo-layer-manager
-        participant E as eden-demo-layer-dao
+        participant B as system-direction-classifier-web
+        participant C as system-direction-classifier-service
+        participant D as system-direction-classifier-manager
+        participant E as system-direction-classifier-dao
     end
     box rgb(255,182,193,0.3) Passive Driver
         participant F as Passive Driver
@@ -229,7 +229,7 @@ This project uses Maven for building. The quickest way to get started is to `git
 This project is configured with a dev environment by default. For your convenience, all external component dependencies are disabled.
 
 1. Run `mvn install` in the project directory (add `-DskipTests` parameter to skip tests).
-2. Navigate to `eden-demo-layer-start` directory, execute `mvn spring-boot:run` or start the `LayerApplication` class. If successful, you'll see the Spring Boot startup screen.
+2. Navigate to `system-direction-classifier-start` directory, execute `mvn spring-boot:run` or start the `SystemDirectionClassifierApplication` class. If successful, you'll see the Spring Boot startup screen.
 3. A simple `RestController` interface is implemented in this application. Click [Demo API](http://localhost:8082/api/users/1) to test.
 4. Since frontend-backend separation is the mainstream approach, please implement pages as needed. Accessing [http://localhost:8082](http://localhost:8082) will redirect to a 404 page.
 
@@ -237,7 +237,7 @@ This project is configured with a dev environment by default. For your convenien
 
 ### Configuration Tuning
 
-**Enable Service Registry and Configuration Management**: We recommend using `Nacos`. You can refer to [Nacos Quick Start](https://nacos.io/en-us/docs/quick-start.html) for quick setup. Modify the configuration file according to your Nacos address: [bootstrap-dev.yml](https://github.com/shiyindaxiaojie/eden-demo-layer/blob/main/eden-demo-layer-start/src/main/resources/config/bootstrap-dev.yml):
+**Enable Service Registry and Configuration Management**: We recommend using `Nacos`. You can refer to [Nacos Quick Start](https://nacos.io/en-us/docs/quick-start.html) for quick setup. Modify the configuration file according to your Nacos address: [bootstrap-dev.yml](https://github.com/jhy175/system-direction-classifier/blob/main/system-direction-classifier-start/src/main/resources/config/bootstrap-dev.yml):
 
 ```yaml
 spring:
@@ -249,7 +249,7 @@ spring:
         enabled: true # Disabled by default, enable as needed
 ```
 
-**Modify Default Data Source**: This project uses `H2` in-memory database by default, with `Liquibase` automatically initializing SQL scripts at startup. If you're using an external MySQL database, adjust the connection information here: [application-dev.yml](https://github.com/shiyindaxiaojie/eden-demo-layer/blob/main/eden-demo-layer-start/src/main/resources/config/application-dev.yml), and remove any `H2` related configurations.
+**Modify Default Data Source**: This project uses `H2` in-memory database by default, with `Liquibase` automatically initializing SQL scripts at startup. If you're using an external MySQL database, adjust the connection information here: [application-dev.yml](https://github.com/jhy175/system-direction-classifier/blob/main/system-direction-classifier-start/src/main/resources/config/application-dev.yml), and remove any `H2` related configurations.
 
 ```yaml
 spring:

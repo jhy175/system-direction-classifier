@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.service.rpc;
+package cn.edu.whu.irlab.systemdirectionclassifier.service.rpc;
 
 import org.apache.dubbo.config.annotation.DubboService;
-import org.ylzl.eden.demo.api.RoleService;
-import org.ylzl.eden.demo.dao.RoleDAO;
-import org.ylzl.eden.demo.manager.dao.RbacManager;
-import org.ylzl.eden.demo.service.constant.RPC;
-import org.ylzl.eden.demo.service.converter.MenuConvertor;
-import org.ylzl.eden.demo.service.converter.PermissionConvertor;
-import org.ylzl.eden.demo.service.converter.RoleConvertor;
-import org.ylzl.eden.demo.service.impl.RoleServiceImpl;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.RoleService;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.RoleDAO;
+import cn.edu.whu.irlab.systemdirectionclassifier.manager.dao.RbacManager;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.constant.RPC;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.converter.MenuConvertor;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.converter.PermissionConvertor;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.converter.RoleConvertor;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.impl.RoleServiceImpl;
 
 /**
  * 角色业务 RPC服务端

@@ -5,7 +5,7 @@ logging:
   level:
     ROOT: INFO
     org.ylzl.eden: DEBUG
-    org.ylzl.eden.demo.infrastructure: DEBUG
+    cn.edu.whu.irlab.systemdirectionclassifier.infrastructure: DEBUG
 
 mybatis-plus:
   global-config:

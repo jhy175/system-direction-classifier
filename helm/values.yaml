@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: shiyindaxiaojie/eden-demo-layer
+  repository: jhy175/system-direction-classifier
   pullPolicy: IfNotPresent
   tag: "latest"
 

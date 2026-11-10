@@ -39,7 +39,7 @@ jobs:
 
       - name: Build with Maven
         run: |
-          echo "<settings><servers><server><id>github</id><username>OWNER</username><password>${GITHUB_TOKEN}</password></server></servers><profiles><profile><id>github</id><properties><altReleaseDeploymentRepository>github::default::https://maven.pkg.github.com/shiyindaxiaojie/eden-demo-layer</altReleaseDeploymentRepository><altSnapshotDeploymentRepository>github::default::https://maven.pkg.github.com/shiyindaxiaojie/eden-demo-layer</altSnapshotDeploymentRepository></properties><repositories><repository><id>github</id><name>GitHub OWNER Apache Maven Packages</name><url>https://maven.pkg.github.com/shiyindaxiaojie/eden-architect</url></repository></repositories></profile></profiles></settings>" > $GITHUB_WORKSPACE/settings.xml
+          echo "<settings><servers><server><id>github</id><username>OWNER</username><password>${GITHUB_TOKEN}</password></server></servers><profiles><profile><id>github</id><properties><altReleaseDeploymentRepository>github::default::https://maven.pkg.github.com/jhy175/system-direction-classifier</altReleaseDeploymentRepository><altSnapshotDeploymentRepository>github::default::https://maven.pkg.github.com/jhy175/system-direction-classifier</altSnapshotDeploymentRepository></properties><repositories><repository><id>github</id><name>GitHub OWNER Apache Maven Packages</name><url>https://maven.pkg.github.com/shiyindaxiaojie/eden-architect</url></repository></repositories></profile></profiles></settings>" > $GITHUB_WORKSPACE/settings.xml
           chmod +x mvnw
           ./mvnw -ntp clean package -Pgithub,unit-test -e -T 4C -s $GITHUB_WORKSPACE/settings.xml
         env:
@@ -61,5 +61,5 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_IMAGE: shiyindaxiaojie/eden-demo-layer
+          DOCKER_IMAGE: jhy175/system-direction-classifier
           DOCKER_VERSION: 1.0.0

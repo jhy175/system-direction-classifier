@@ -3,19 +3,19 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-		<artifactId>eden-demo-layer</artifactId>
+		<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+		<artifactId>system-direction-classifier</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>eden-demo-layer-start</artifactId>
+	<artifactId>system-direction-classifier-start</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>eden-demo-layer-start</name>
+	<name>system-direction-classifier-start</name>
 	<description>应用启动入口</description>
 
 	<properties>
-		<start-class>org.ylzl.eden.demo.LayerApplication</start-class>
+		<start-class>cn.edu.whu.irlab.systemdirectionclassifier.SystemDirectionClassifierApplication</start-class>
 		<maven.deploy.skip>true</maven.deploy.skip>
 		<build.layers.enabled>true</build.layers.enabled>
 	</properties>
@@ -106,8 +106,8 @@
 	<dependencies>
 		<!-- Web 组件 -->
 		<dependency>
-			<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-			<artifactId>eden-demo-layer-web</artifactId>
+			<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+			<artifactId>system-direction-classifier-web</artifactId>
 		</dependency>
 
 		<!-- 开发组件 -->

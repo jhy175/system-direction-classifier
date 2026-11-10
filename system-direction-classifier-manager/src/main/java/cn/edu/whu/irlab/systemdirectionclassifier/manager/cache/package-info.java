@@ -10,4 +10,4 @@
  * @author <a href="mailto:shiyindaxiaojie@gmail.com">gyl</a>
  * @since 2.4.14
  */
-package org.ylzl.eden.demo.manager.cache;
+package cn.edu.whu.irlab.systemdirectionclassifier.manager.cache;

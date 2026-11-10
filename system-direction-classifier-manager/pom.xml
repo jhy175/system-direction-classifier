@@ -3,15 +3,15 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-		<artifactId>eden-demo-layer</artifactId>
+		<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+		<artifactId>system-direction-classifier</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>eden-demo-layer-manager</artifactId>
+	<artifactId>system-direction-classifier-manager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>eden-demo-layer-manager</name>
+	<name>system-direction-classifier-manager</name>
 	<description>通用业务处理层</description>
 
 	<properties>
@@ -21,8 +21,8 @@
 	<dependencies>
 		<!-- 数据访问组件 -->
 		<dependency>
-			<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-			<artifactId>eden-demo-layer-dao</artifactId>
+			<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+			<artifactId>system-direction-classifier-dao</artifactId>
 		</dependency>
 
 		<!-- 开发组件 -->

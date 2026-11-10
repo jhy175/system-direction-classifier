@@ -1,12 +1,12 @@
 # Windows 本地启动
 
-在本项目根目录 `eden-demo-layer` 打开 PowerShell，每次启动运行：
+在本项目根目录 `system-direction-classifier` 打开 PowerShell，每次启动运行：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start.ps1
 ```
 
-脚本使用项目本地 JDK 8，启用 `dev` 配置，将日志与临时文件放在 `logs` 下。在终端看到 `Started LayerApplication` 后，检查：
+脚本使用项目本地 JDK 8，启用 `dev` 配置，将日志与临时文件放在 `logs` 下。在终端看到 `Started SystemDirectionClassifierApplication` 后，检查：
 
 ```powershell
 Invoke-RestMethod http://localhost:9082/actuator/health

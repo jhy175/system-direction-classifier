@@ -151,7 +151,7 @@ management:
 logging:
   access:
     enabled: true
-    expression: within(org.ylzl.eden.demo.adapter.*.web..*)
+    expression: within(cn.edu.whu.irlab.systemdirectionclassifier.adapter.*.web..*)
 
 liquibase: # 数据库迁移工具
   async: true # 异步执行
@@ -171,7 +171,7 @@ mybatis-plus: # ORM 组件
     auto-mapping-behavior: full
     call-setters-on-nulls: true
     use-column-label: true
-  type-aliases-package: org.ylzl.eden.demo.infrastructure
+  type-aliases-package: cn.edu.whu.irlab.systemdirectionclassifier.infrastructure
 
 arthas: # 在线诊断工具
   agent-id: ${spring.application.name}@${random.value}
@@ -183,7 +183,7 @@ arthas: # 在线诊断工具
 dubbo: # 分布式调用组件
   enabled: false # 默认关闭，请按需开启，请不要使用 @EnabledDubbo 原生注解，否则无法关闭
   scan:
-    base-packages: org.ylzl.eden.demo.adapter # Dubbo 服务扫描
+    base-packages: cn.edu.whu.irlab.systemdirectionclassifier.adapter # Dubbo 服务扫描
   application:
     id: ${spring.application.name}
     qos-enable: false

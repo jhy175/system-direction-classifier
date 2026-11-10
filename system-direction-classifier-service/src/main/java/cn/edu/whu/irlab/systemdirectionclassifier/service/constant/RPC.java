@@ -1,4 +1,4 @@
-package org.ylzl.eden.demo.service.constant;
+package cn.edu.whu.irlab.systemdirectionclassifier.service.constant;
 
 import lombok.experimental.UtilityClass;
 

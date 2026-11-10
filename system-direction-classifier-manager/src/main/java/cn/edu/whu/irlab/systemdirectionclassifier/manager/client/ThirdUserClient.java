@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.manager.client;
+package cn.edu.whu.irlab.systemdirectionclassifier.manager.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.ylzl.eden.demo.dao.database.dataobject.UserDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.UserDO;
 
 /**
  * 第三方用户系统客户端

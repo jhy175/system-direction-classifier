@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.dao;
+package cn.edu.whu.irlab.systemdirectionclassifier.dao;
 
 import java.util.List;
 

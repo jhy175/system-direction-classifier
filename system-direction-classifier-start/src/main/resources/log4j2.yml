@@ -5,7 +5,7 @@ Configuration:
   Properties:
     Property:
       - name: APP_NAME
-        value: $${spring:spring.application.name:-eden-demo-layer}
+        value: $${spring:spring.application.name:-system-direction-classifier}
       - name: PROFILES
         value: $${spring:spring.profiles.active}
       - name: LOG_PATH
@@ -133,7 +133,7 @@ Configuration:
         - ref: ERROR_FILE # 本地开发可以选择注释掉
         - ref: CAT # 默认关闭，开启后将日志发送到 CAT 监控平台
     AsyncLogger:
-      - name: org.ylzl.eden.demo # 应用日志
+      - name: cn.edu.whu.irlab.systemdirectionclassifier # 应用日志
         level: INFO
       - name: org.ylzl.eden # 框架调试日志只输出到控制台
         level: DEBUG

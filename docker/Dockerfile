@@ -3,7 +3,7 @@ FROM openjdk:11-jdk-slim AS builder
 
 # 设置工作目录并指定构建模块
 WORKDIR /app
-ARG MODULE=eden-demo-layer-start
+ARG MODULE=system-direction-classifier-start
 
 # 复制必要文件
 COPY $MODULE/target/$MODULE.jar application.jar

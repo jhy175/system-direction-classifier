@@ -1,10 +1,10 @@
-package org.ylzl.eden.demo.dao.impl
+package cn.edu.whu.irlab.systemdirectionclassifier.dao.impl
 
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.ylzl.eden.demo.dao.database.dataobject.UserDO
-import org.ylzl.eden.demo.dao.database.mapper.UserMapper
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.UserDO
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.mapper.UserMapper
 import spock.lang.Specification
 import spock.lang.Unroll
 

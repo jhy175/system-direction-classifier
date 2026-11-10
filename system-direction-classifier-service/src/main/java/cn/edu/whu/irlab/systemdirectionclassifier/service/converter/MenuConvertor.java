@@ -1,13 +1,13 @@
-package org.ylzl.eden.demo.service.converter;
+package cn.edu.whu.irlab.systemdirectionclassifier.service.converter;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.ylzl.eden.demo.api.dto.MenuRequestDTO;
-import org.ylzl.eden.demo.api.dto.MenuResponseDTO;
-import org.ylzl.eden.demo.api.dto.MenuTreeDTO;
-import org.ylzl.eden.demo.dao.database.dataobject.MenuDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.MenuRequestDTO;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.MenuResponseDTO;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.MenuTreeDTO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.MenuDO;
 
 import java.util.ArrayList;
 import java.util.List;

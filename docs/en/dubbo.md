@@ -21,7 +21,7 @@ Modify `application-dev.yml`:
 dubbo:
   enabled: true # Switch, do not use @EnabledDubbo annotation, otherwise cannot be disabled
   scan:
-    base-packages: org.ylzl.eden.demo.service # Dubbo service scan
+    base-packages: cn.edu.whu.irlab.systemdirectionclassifier.service # Dubbo service scan
   application:
     id: ${spring.application.name}
     name: ${spring.application.name}

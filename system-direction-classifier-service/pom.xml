@@ -3,15 +3,15 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-		<artifactId>eden-demo-layer</artifactId>
+		<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+		<artifactId>system-direction-classifier</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>eden-demo-layer-service</artifactId>
+	<artifactId>system-direction-classifier-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>eden-demo-layer-service</name>
+	<name>system-direction-classifier-service</name>
 	<description>业务逻辑服务层</description>
 
 	<properties>
@@ -21,18 +21,18 @@
 	<dependencies>
 		<!-- API 组件 -->
 		<dependency>
-			<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-			<artifactId>eden-demo-layer-api</artifactId>
+			<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+			<artifactId>system-direction-classifier-api</artifactId>
 		</dependency>
 		<!-- 数据访问组件 -->
 		<dependency>
-			<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-			<artifactId>eden-demo-layer-dao</artifactId>
+			<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+			<artifactId>system-direction-classifier-dao</artifactId>
 		</dependency>
 		<!-- 管理组件 -->
 		<dependency>
-			<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-			<artifactId>eden-demo-layer-manager</artifactId>
+			<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+			<artifactId>system-direction-classifier-manager</artifactId>
 		</dependency>
 
 		<!-- 开发组件 -->

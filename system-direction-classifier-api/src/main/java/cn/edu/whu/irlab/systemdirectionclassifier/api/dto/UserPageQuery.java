@@ -1,4 +1,4 @@
-package org.ylzl.eden.demo.api.dto;
+package cn.edu.whu.irlab.systemdirectionclassifier.api.dto;
 
 import lombok.*;
 import org.ylzl.eden.spring.framework.dto.PageQuery;

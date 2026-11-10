@@ -1,9 +1,9 @@
-package org.ylzl.eden.demo
+package cn.edu.whu.irlab.systemdirectionclassifier
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.ylzl.eden.demo.api.dto.UserResponseDTO
-import org.ylzl.eden.demo.web.UserController
+import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.UserResponseDTO
+import cn.edu.whu.irlab.systemdirectionclassifier.web.UserController
 import org.ylzl.eden.spring.framework.dto.SingleResult
 import spock.lang.Specification
 import spock.lang.Unroll

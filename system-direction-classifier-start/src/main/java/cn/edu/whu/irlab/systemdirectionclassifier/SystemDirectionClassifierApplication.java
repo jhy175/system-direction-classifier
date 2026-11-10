@@ -1,4 +1,4 @@
-package org.ylzl.eden.demo;
+package cn.edu.whu.irlab.systemdirectionclassifier;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,7 +21,7 @@ import org.ylzl.eden.spring.framework.web.rest.annotation.EnableRestExceptionHan
 @EnableTransactionManagement
 @Slf4j
 @SpringBootApplication
-public class LayerApplication {
+public class SystemDirectionClassifierApplication {
 
 	/**
 	 * 启动入口
@@ -29,6 +29,6 @@ public class LayerApplication {
 	 * @param args 命令行参数
 	 */
 	public static void main(String[] args) {
-		SpringBootApplicationHelper.run(LayerApplication.class, args, WebApplicationType.SERVLET);
+		SpringBootApplicationHelper.run(SystemDirectionClassifierApplication.class, args, WebApplicationType.SERVLET);
 	}
 }

@@ -2,10 +2,10 @@
 
 # 分层架构
 
-[![](https://cdn.jsdelivr.net/gh/shiyindaxiaojie/cdn/readme/language-java-blue.svg)](https://github.com/shiyindaxiaojie/eden-demo-layer)
-[![Build Status](https://github.com/shiyindaxiaojie/eden-demo-layer/actions/workflows/maven-ci.yml/badge.svg?branch=main)](https://github.com/shiyindaxiaojie/eden-demo-layer/actions)
+[![](https://cdn.jsdelivr.net/gh/shiyindaxiaojie/cdn/readme/language-java-blue.svg)](https://github.com/jhy175/system-direction-classifier)
+[![Build Status](https://github.com/jhy175/system-direction-classifier/actions/workflows/maven-ci.yml/badge.svg?branch=main)](https://github.com/jhy175/system-direction-classifier/actions)
 [![License](https://cdn.jsdelivr.net/gh/shiyindaxiaojie/cdn/readme/license-apache2.0-red.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=shiyindaxiaojie_eden-demo-layer&metric=alert_status)](https://sonarcloud.io/dashboard?id=shiyindaxiaojie_eden-demo-layer)
+[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=shiyindaxiaojie_system-direction-classifier&metric=alert_status)](https://sonarcloud.io/dashboard?id=shiyindaxiaojie_system-direction-classifier)
 
 <p>
   <strong>经典的、面向数据模型的分层应用架构</strong>
@@ -51,12 +51,12 @@ flowchart TB
     end
 
     %% 分层架构核心组件
-    WEB["«Web层»<br/>eden-demo-layer-web"]
-    START["«启动入口»<br/>eden-demo-layer-start"]
-    SERVICE["«Service层»<br/>eden-demo-layer-service"]
-    API["«API层»<br/>eden-demo-layer-api"]
-    MANAGER["«Manager层»<br/>eden-demo-layer-manager"]
-    DAO["«DAO层»<br/>eden-demo-layer-dao"]
+    WEB["«Web层»<br/>system-direction-classifier-web"]
+    START["«启动入口»<br/>system-direction-classifier-start"]
+    SERVICE["«Service层»<br/>system-direction-classifier-service"]
+    API["«API层»<br/>system-direction-classifier-api"]
+    MANAGER["«Manager层»<br/>system-direction-classifier-manager"]
+    DAO["«DAO层»<br/>system-direction-classifier-dao"]
 
     %% 接口节点
     rpc((rpc))
@@ -121,12 +121,12 @@ flowchart TB
     style http fill:#fff,stroke:#333
 ```
 
-* **eden-demo-layer-web**：Web 层，请求处理层，对访问控制进行转发，各类基本参数校验，或者不复用的业务简单处理等。
-* **eden-demo-layer-service**：Service 层，业务逻辑服务层，核心业务实现。
-* **eden-demo-layer-api**：API 层，对外以 `jar` 包的形式提供接口定义（DTO、Service 接口）。
-* **eden-demo-layer-manager**：Manager 层，通用业务处理层，对第三方平台进行接口封装，对 `Service` 层通用能力的下沉，如缓存方案、中间件通用处理，与 `DAO` 层交互，对多个 `DAO` 的组合复用。
-* **eden-demo-layer-dao**：DAO 层，数据持久层，与底层 `MySQL`、`Elasticsearch`、`MongoDB` 等进行数据交互。
-* **eden-demo-layer-start**：程序启动入口，统一管理应用的配置和交付。
+* **system-direction-classifier-web**：Web 层，请求处理层，对访问控制进行转发，各类基本参数校验，或者不复用的业务简单处理等。
+* **system-direction-classifier-service**：Service 层，业务逻辑服务层，核心业务实现。
+* **system-direction-classifier-api**：API 层，对外以 `jar` 包的形式提供接口定义（DTO、Service 接口）。
+* **system-direction-classifier-manager**：Manager 层，通用业务处理层，对第三方平台进行接口封装，对 `Service` 层通用能力的下沉，如缓存方案、中间件通用处理，与 `DAO` 层交互，对多个 `DAO` 的组合复用。
+* **system-direction-classifier-dao**：DAO 层，数据持久层，与底层 `MySQL`、`Elasticsearch`、`MongoDB` 等进行数据交互。
+* **system-direction-classifier-start**：程序启动入口，统一管理应用的配置和交付。
 
 ## 运行流程
 
@@ -166,10 +166,10 @@ sequenceDiagram
         participant A as 主动适配器
     end
     box rgb(144,238,144,0.3) 分层应用架构
-        participant B as eden-demo-layer-web
-        participant C as eden-demo-layer-service
-        participant D as eden-demo-layer-manager
-        participant E as eden-demo-layer-dao
+        participant B as system-direction-classifier-web
+        participant C as system-direction-classifier-service
+        participant D as system-direction-classifier-manager
+        participant E as system-direction-classifier-dao
     end
     box rgb(255,182,193,0.3) 被动驱动器
         participant F as 被动驱动器
@@ -231,7 +231,7 @@ sequenceDiagram
 本项目默认设置了 dev 运行环境，为了方便您直接启动项目，所有外部的组件依赖均为关闭状态。
 
 1. 在项目目录下运行 `mvn install`（如果不想运行测试，可以加上 `-DskipTests` 参数）。
-2. 进入 `eden-demo-layer-start` 目录，执行 `mvn spring-boot:run` 或者启动 `LayerApplication` 类。运行成功的话，可以看到 `Spring Boot` 启动成功的界面。
+2. 进入 `system-direction-classifier-start` 目录，执行 `mvn spring-boot:run` 或者启动 `SystemDirectionClassifierApplication` 类。运行成功的话，可以看到 `Spring Boot` 启动成功的界面。
 3. 本应用中已经实现了一个简单的 `RestController` 接口，可以点击 [演示接口](http://localhost:8082/api/users/1) 进行调试。
 4. 由于目前的主流是前后端分离开发，请按需实现页面。访问 [http://localhost:8082](http://localhost:8082) 将跳转到 404 页面。
 
@@ -239,7 +239,7 @@ sequenceDiagram
 
 ### 微调配置
 
-**开启注册中心和配置管理**：推荐使用 `Nacos` 组件，您可以查阅 [Nacos Quick Start](https://nacos.io/zh-cn/docs/quick-start.html) 快速搭建，请根据您的 Nacos 地址修改配置文件：[bootstrap-dev.yml](https://github.com/shiyindaxiaojie/eden-demo-layer/blob/main/eden-demo-layer-start/src/main/resources/config/bootstrap-dev.yml)，调整以下内容：
+**开启注册中心和配置管理**：推荐使用 `Nacos` 组件，您可以查阅 [Nacos Quick Start](https://nacos.io/zh-cn/docs/quick-start.html) 快速搭建，请根据您的 Nacos 地址修改配置文件：[bootstrap-dev.yml](https://github.com/jhy175/system-direction-classifier/blob/main/system-direction-classifier-start/src/main/resources/config/bootstrap-dev.yml)，调整以下内容：
 
 ```yaml
 spring:
@@ -251,7 +251,7 @@ spring:
         enabled: true # 默认关闭，请按需开启
 ```
 
-**修改默认的数据源**：本项目默认使用 `H2` 内存数据库启动，基于 `Liquibase` 在项目启动时自动初始化 SQL 脚本。如果您使用的是外部的 MySQL 数据库，可以从此处调整下数据库的连接信息：[application-dev.yml](https://github.com/shiyindaxiaojie/eden-demo-layer/blob/main/eden-demo-layer-start/src/main/resources/config/application-dev.yml)，请删除任何与 `H2` 有关的配置。
+**修改默认的数据源**：本项目默认使用 `H2` 内存数据库启动，基于 `Liquibase` 在项目启动时自动初始化 SQL 脚本。如果您使用的是外部的 MySQL 数据库，可以从此处调整下数据库的连接信息：[application-dev.yml](https://github.com/jhy175/system-direction-classifier/blob/main/system-direction-classifier-start/src/main/resources/config/application-dev.yml)，请删除任何与 `H2` 有关的配置。
 
 ```yaml
 spring:
@@ -278,15 +278,15 @@ spring:
 执行 `mvn -T 4C clean package` 打包成一个可运行的 fat jar，参考如下命令启动编译后的控制台。
 
 ```bash
-java -Dserver.port=8082 -jar target/eden-demo-layer-start.jar
+java -Dserver.port=8082 -jar target/system-direction-classifier-start.jar
 ```
 
 ### Assembly 打包部署
 
 执行 `mvn -P assembly -T 4C clean package` 打包成压缩包，选择下列压缩包复制一份到您期望部署的目录。
 
-* target/eden-demo-layer-start-assembly.zip
-* target/eden-demo-layer-start-assembly.tar.gz
+* target/system-direction-classifier-start-assembly.zip
+* target/system-direction-classifier-start-assembly.tar.gz
 
 解压文件后，您可以在 `bin` 目录下找到 `startup.sh` 或者 `startup.bat`脚本，直接运行即可。
 
@@ -296,7 +296,7 @@ Google Jib 插件允许您在没有安装 Docker 下完成镜像的构建。
 
 ```bash
 mvn -T 4C -U package
-mvn -pl eden-demo-layer-start jib:build -Djib.disableUpdateChecks=true -DskipTests
+mvn -pl system-direction-classifier-start jib:build -Djib.disableUpdateChecks=true -DskipTests
 ```
 
 ### Docker 容器部署
@@ -304,7 +304,7 @@ mvn -pl eden-demo-layer-start jib:build -Djib.disableUpdateChecks=true -DskipTes
 基于 Spring Boot 的分层特性构建镜像，请确保正确安装了 Docker 工具，然后执行以下命令。
 
 ```bash
-docker build -f docker/Dockerfile -t eden-demo-layer:{tag} .
+docker build -f docker/Dockerfile -t system-direction-classifier:{tag} .
 ```
 
 ### Helm 应用部署
@@ -312,8 +312,8 @@ docker build -f docker/Dockerfile -t eden-demo-layer:{tag} .
 以应用为中心，建议使用 Helm 统一管理所需部署的 K8s 资源描述文件，请参考以下命令完成应用的安装和卸载。
 
 ```bash
-helm install eden-demo-layer ./helm # 部署资源
-helm uninstall eden-demo-layer # 卸载资源
+helm install system-direction-classifier ./helm # 部署资源
+helm uninstall system-direction-classifier # 卸载资源
 ```
 
 ## 持续集成
@@ -382,20 +382,20 @@ flowchart LR
 
 | 层级 | 职责 | 代码位置 | 命名规范 |
 |------|------|----------|----------|
-| DAO 层 | 数据持久化，与数据库交互 | `eden-demo-layer-dao` | `XxxDO`, `XxxMapper`, `XxxDAO` |
-| API 层 | 对外接口定义，DTO 定义 | `eden-demo-layer-api` | `XxxService`, `XxxDTO` |
-| Manager 层 | 通用业务处理，DAO 组合复用 | `eden-demo-layer-manager` | `XxxManager` |
-| Service 层 | 核心业务逻辑实现 | `eden-demo-layer-service` | `XxxServiceImpl`, `XxxConvertor` |
-| Web 层 | REST API 入口，参数校验 | `eden-demo-layer-web` | `XxxController` |
+| DAO 层 | 数据持久化，与数据库交互 | `system-direction-classifier-dao` | `XxxDO`, `XxxMapper`, `XxxDAO` |
+| API 层 | 对外接口定义，DTO 定义 | `system-direction-classifier-api` | `XxxService`, `XxxDTO` |
+| Manager 层 | 通用业务处理，DAO 组合复用 | `system-direction-classifier-manager` | `XxxManager` |
+| Service 层 | 核心业务逻辑实现 | `system-direction-classifier-service` | `XxxServiceImpl`, `XxxConvertor` |
+| Web 层 | REST API 入口，参数校验 | `system-direction-classifier-web` | `XxxController` |
 
 **代码结构示例**
 
 以角色管理为例，展示各层的代码组织：
 
 ```
-eden-demo-layer/
-├── eden-demo-layer-dao/                    # DAO 层
-│   └── src/main/java/org/ylzl/eden/demo/dao/
+system-direction-classifier/
+├── system-direction-classifier-dao/                    # DAO 层
+│   └── src/main/java/cn/edu/whu/irlab/systemdirectionclassifier/dao/
 │       ├── database/
 │       │   ├── dataobject/
 │       │   │   └── RoleDO.java             # 数据对象
@@ -405,20 +405,20 @@ eden-demo-layer/
 │       └── impl/
 │           └── RoleDAOImpl.java            # DAO 实现
 │
-├── eden-demo-layer-api/                    # API 层
-│   └── src/main/java/org/ylzl/eden/demo/api/
+├── system-direction-classifier-api/                    # API 层
+│   └── src/main/java/cn/edu/whu/irlab/systemdirectionclassifier/api/
 │       ├── RoleService.java                # Service 接口
 │       └── dto/
 │           ├── RoleRequestDTO.java         # 请求 DTO
 │           └── RoleResponseDTO.java        # 响应 DTO
 │
-├── eden-demo-layer-manager/                # Manager 层
-│   └── src/main/java/org/ylzl/eden/demo/manager/
+├── system-direction-classifier-manager/                # Manager 层
+│   └── src/main/java/cn/edu/whu/irlab/systemdirectionclassifier/manager/
 │       └── dao/
 │           └── RbacManager.java            # 通用业务处理
 │
-├── eden-demo-layer-service/                # Service 层
-│   └── src/main/java/org/ylzl/eden/demo/service/
+├── system-direction-classifier-service/                # Service 层
+│   └── src/main/java/cn/edu/whu/irlab/systemdirectionclassifier/service/
 │       ├── converter/
 │       │   └── RoleConvertor.java          # 对象转换器
 │       ├── impl/
@@ -426,8 +426,8 @@ eden-demo-layer/
 │       └── rpc/
 │           └── RoleProvider.java           # RPC 服务提供者
 │
-└── eden-demo-layer-web/                    # Web 层
-    └── src/main/java/org/ylzl/eden/demo/web/
+└── system-direction-classifier-web/                    # Web 层
+    └── src/main/java/cn/edu/whu/irlab/systemdirectionclassifier/web/
         └── RoleController.java             # REST Controller
 ```
 
@@ -502,4 +502,4 @@ flowchart LR
 
 ## 变更日志
 
-请查阅 [CHANGELOG.md](https://github.com/shiyindaxiaojie/eden-demo-layer/blob/main/CHANGELOG.md)
+请查阅 [CHANGELOG.md](https://github.com/jhy175/system-direction-classifier/blob/main/CHANGELOG.md)

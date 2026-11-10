@@ -3,15 +3,15 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-		<artifactId>eden-demo-layer</artifactId>
+		<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+		<artifactId>system-direction-classifier</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>eden-demo-layer-api</artifactId>
+	<artifactId>system-direction-classifier-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>eden-demo-layer-api</name>
+	<name>system-direction-classifier-api</name>
 	<description>开放 API 层</description>
 
 	<dependencies>

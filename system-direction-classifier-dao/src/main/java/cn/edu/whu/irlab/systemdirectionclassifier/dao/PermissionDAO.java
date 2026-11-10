@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.dao;
+package cn.edu.whu.irlab.systemdirectionclassifier.dao;
 
 import com.github.pagehelper.Page;
-import org.ylzl.eden.demo.dao.database.dataobject.PermissionDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.PermissionDO;
 
 import java.util.List;
 

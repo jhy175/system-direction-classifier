@@ -1,1 +1,1 @@
-package org.ylzl.eden.demo.web;
+package cn.edu.whu.irlab.systemdirectionclassifier.web;

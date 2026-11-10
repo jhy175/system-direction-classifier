@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.service.rpc;
+package cn.edu.whu.irlab.systemdirectionclassifier.service.rpc;
 
 import org.apache.dubbo.config.annotation.DubboService;
-import org.ylzl.eden.demo.api.PermissionService;
-import org.ylzl.eden.demo.dao.PermissionDAO;
-import org.ylzl.eden.demo.manager.dao.RbacManager;
-import org.ylzl.eden.demo.service.constant.RPC;
-import org.ylzl.eden.demo.service.converter.PermissionConvertor;
-import org.ylzl.eden.demo.service.impl.PermissionServiceImpl;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.PermissionService;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.PermissionDAO;
+import cn.edu.whu.irlab.systemdirectionclassifier.manager.dao.RbacManager;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.constant.RPC;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.converter.PermissionConvertor;
+import cn.edu.whu.irlab.systemdirectionclassifier.service.impl.PermissionServiceImpl;
 
 /**
  * 权限业务 RPC服务端

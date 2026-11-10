@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.ylzl.eden.demo.dao.impl;
+package cn.edu.whu.irlab.systemdirectionclassifier.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.ylzl.eden.demo.dao.RolePermissionDAO;
-import org.ylzl.eden.demo.dao.database.dataobject.RolePermissionDO;
-import org.ylzl.eden.demo.dao.database.mapper.RolePermissionMapper;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.RolePermissionDAO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.RolePermissionDO;
+import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.mapper.RolePermissionMapper;
 
 import java.util.Collections;
 import java.util.List;

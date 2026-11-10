@@ -8,20 +8,20 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath/>
 	</parent>
-	<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-	<artifactId>eden-demo-layer</artifactId>
+	<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+	<artifactId>system-direction-classifier</artifactId>
 	<packaging>pom</packaging>
-	<name>eden-demo-layer</name>
+	<name>system-direction-classifier</name>
 	<version>0.0.1-SNAPSHOT</version>
-	<description>阿里巴巴分层应用架构</description>
+	<description>学科交叉算法调试系统</description>
 
 	<modules>
-		<module>eden-demo-layer-api</module>
-		<module>eden-demo-layer-dao</module>
-		<module>eden-demo-layer-manager</module>
-		<module>eden-demo-layer-service</module>
-		<module>eden-demo-layer-web</module>
-		<module>eden-demo-layer-start</module>
+		<module>system-direction-classifier-api</module>
+		<module>system-direction-classifier-dao</module>
+		<module>system-direction-classifier-manager</module>
+		<module>system-direction-classifier-service</module>
+		<module>system-direction-classifier-web</module>
+		<module>system-direction-classifier-start</module>
 	</modules>
 
 	<developers>
@@ -45,14 +45,14 @@
 	</licenses>
 
 	<scm>
-		<url>https://github.com/shiyindaxiaojie/eden-demo-layer</url>
-		<connection>scm:git:git://github.com/shiyindaxiaojie/eden-demo-layer.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/shiyindaxiaojie/eden-demo-layer.git</developerConnection>
+		<url>https://github.com/jhy175/system-direction-classifier</url>
+		<connection>scm:git:git://github.com/jhy175/system-direction-classifier.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/jhy175/system-direction-classifier.git</developerConnection>
 	</scm>
 
 	<issueManagement>
 		<system>Github</system>
-		<url>https://github.com/shiyindaxiaojie/eden-demo-layer/issues</url>
+		<url>https://github.com/jhy175/system-direction-classifier/issues</url>
 	</issueManagement>
 
 	<repositories>
@@ -81,28 +81,28 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-				<artifactId>eden-demo-layer-api</artifactId>
+				<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+				<artifactId>system-direction-classifier-api</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-				<artifactId>eden-demo-layer-dao</artifactId>
+				<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+				<artifactId>system-direction-classifier-dao</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-				<artifactId>eden-demo-layer-manager</artifactId>
+				<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+				<artifactId>system-direction-classifier-manager</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-				<artifactId>eden-demo-layer-service</artifactId>
+				<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+				<artifactId>system-direction-classifier-service</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.shiyindaxiaojie.eden.demo</groupId>
-				<artifactId>eden-demo-layer-web</artifactId>
+				<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
+				<artifactId>system-direction-classifier-web</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
