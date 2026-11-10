@@ -9,7 +9,7 @@ Configuration:
       - name: PROFILES
         value: $${spring:spring.profiles.active}
       - name: LOG_PATH
-        value: $${spring:logging.file.path:-/app/logs}
+        value: $${spring:logging.file.path:-./logs}
       - name: LOG_PATTERN
         value: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [${PROFILES}] [%t] [%X{traceId}] %msg%n"
       - name: CAT_PATTERN

@@ -65,9 +65,9 @@ public class MenuDO implements Serializable {
 	@TableField("component")
 	private String component;
 
-	@TableField("created_date")
+	@TableField("created_at")
 	private LocalDateTime createdDate;
 
-	@TableField("last_modified_date")
+	@TableField("updated_at")
 	private LocalDateTime lastModifiedDate;
 }

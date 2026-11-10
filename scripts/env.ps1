@@ -7,7 +7,14 @@ if (Test-Path (Join-Path $localJdk 'bin/javac.exe')) {
 if (!$env:JAVA_HOME -or !(Test-Path (Join-Path $env:JAVA_HOME 'bin/javac.exe'))) {
     throw 'A full JDK 8 is required. Run scripts/bootstrap.ps1 first, or set JAVA_HOME.'
 }
-$javaVersion = (& (Join-Path $env:JAVA_HOME 'bin/javac.exe') -version 2>&1 | Out-String)
+$savedErrorActionPreference = $ErrorActionPreference
+try {
+    # JDK 8 prints its version to stderr; Windows PowerShell treats it as an error record.
+    $ErrorActionPreference = 'Continue'
+    $javaVersion = (& (Join-Path $env:JAVA_HOME 'bin/javac.exe') -version 2>&1 | Out-String)
+} finally {
+    $ErrorActionPreference = $savedErrorActionPreference
+}
 if ($javaVersion -notmatch 'javac 1\.8\.') { throw "Expected JDK 8, got: $javaVersion" }
 $env:PATH = (Join-Path $env:JAVA_HOME 'bin') + ';' + $env:PATH
 $global:EdenMavenWrapper = Join-Path $projectRoot 'mvnw.cmd'

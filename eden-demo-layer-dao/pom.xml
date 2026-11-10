@@ -64,6 +64,11 @@
 		<!-- 数据库访问组件 -->
 		<dependency>
 			<groupId>io.github.shiyindaxiaojie</groupId>
+			<artifactId>eden-distributed-uid</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.shiyindaxiaojie</groupId>
 			<artifactId>eden-mybatis-spring-boot-starter</artifactId>
 		</dependency>
 

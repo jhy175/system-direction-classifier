@@ -28,12 +28,12 @@
 		<result column="parent_id" property="parentId"/>
 		<result column="description" property="description"/>
 		<result column="sort" property="sort"/>
-		<result column="created_date" property="createdDate"/>
-		<result column="last_modified_date" property="lastModifiedDate"/>
+		<result column="created_at" property="createdDate"/>
+		<result column="updated_at" property="lastModifiedDate"/>
 	</resultMap>
 
 	<sql id="baseColumns">
-		id, code, name, type, parent_id, description, sort, created_date, last_modified_date
+		id, code, name, type, parent_id, description, sort, created_at, updated_at
 	</sql>
 
 	<select id="selectByCode" resultMap="dbResultMap">

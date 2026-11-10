@@ -29,12 +29,12 @@
 		<result column="sort" property="sort"/>
 		<result column="status" property="status"/>
 		<result column="component" property="component"/>
-		<result column="created_date" property="createdDate"/>
-		<result column="last_modified_date" property="lastModifiedDate"/>
+		<result column="created_at" property="createdDate"/>
+		<result column="updated_at" property="lastModifiedDate"/>
 	</resultMap>
 
 	<sql id="baseColumns">
-		id, name, path, icon, parent_id, sort, status, component, created_date, last_modified_date
+		id, name, path, icon, parent_id, sort, status, component, created_at, updated_at
 	</sql>
 
 	<select id="selectAll" resultMap="dbResultMap">

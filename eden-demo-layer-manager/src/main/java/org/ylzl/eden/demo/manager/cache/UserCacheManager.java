@@ -19,6 +19,7 @@ package org.ylzl.eden.demo.manager.cache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.ylzl.eden.demo.dao.database.dataobject.UserDO;
 
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Slf4j
 @Component
+@ConditionalOnProperty(prefix = "spring.redis", name = "enabled", havingValue = "true")
 public class UserCacheManager {
 
 	private static final String USER_CACHE_KEY_PREFIX = "user:";

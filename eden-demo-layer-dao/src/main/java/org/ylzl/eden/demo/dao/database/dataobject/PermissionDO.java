@@ -86,12 +86,12 @@ public class PermissionDO implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	@TableField("created_date")
+	@TableField("created_at")
 	private LocalDateTime createdDate;
 
 	/**
 	 * 最后修改时间
 	 */
-	@TableField("last_modified_date")
+	@TableField("updated_at")
 	private LocalDateTime lastModifiedDate;
 }
