@@ -1,7 +1,7 @@
 package org.ylzl.eden.demo.api;
 
 import org.ylzl.eden.demo.api.dto.*;
-import org.ylzl.eden.spring.framework.dto.MultiResult;
+import org.ylzl.eden.demo.api.dto.MultiResult;
 import org.ylzl.eden.spring.framework.dto.PageResult;
 import org.ylzl.eden.spring.framework.dto.Result;
 import org.ylzl.eden.spring.framework.dto.SingleResult;

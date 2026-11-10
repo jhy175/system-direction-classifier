@@ -19,7 +19,11 @@ package org.ylzl.eden.demo.service.rpc;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.ylzl.eden.demo.api.UserService;
 import org.ylzl.eden.demo.dao.UserDAO;
+import org.ylzl.eden.demo.manager.dao.RbacManager;
 import org.ylzl.eden.demo.service.constant.RPC;
+import org.ylzl.eden.demo.service.converter.MenuConvertor;
+import org.ylzl.eden.demo.service.converter.PermissionConvertor;
+import org.ylzl.eden.demo.service.converter.RoleConvertor;
 import org.ylzl.eden.demo.service.converter.UserConvertor;
 import org.ylzl.eden.demo.service.impl.UserServiceImpl;
 
@@ -32,7 +36,9 @@ import org.ylzl.eden.demo.service.impl.UserServiceImpl;
 @DubboService(timeout = RPC.DEFAULT_TIMEOUT)
 public class UserProvider extends UserServiceImpl implements UserService {
 
-	public UserProvider(UserDAO userDAO, UserConvertor userConvertor) {
-		super(userDAO, userConvertor);
+	public UserProvider(UserDAO userDAO, RbacManager rbacManager, UserConvertor userConvertor,
+						RoleConvertor roleConvertor, PermissionConvertor permissionConvertor,
+						MenuConvertor menuConvertor) {
+		super(userDAO, rbacManager, userConvertor, roleConvertor, permissionConvertor, menuConvertor);
 	}
 }

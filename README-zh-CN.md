@@ -214,6 +214,8 @@ sequenceDiagram
 
 ## 如何构建
 
+本地 Maven 环境排错、初始化脚本与新机器部署步骤，请参阅 [环境配置与迁移部署](./docs/zh-CN/环境配置与迁移部署.md)。Windows 可在项目根目录执行 `./scripts/bootstrap.ps1`，完成后加载 `. ./scripts/env.ps1` 再运行 `mvn clean compile`。
+
 由于 `Spring Boot 2.4.x` 和 `Spring Boot 3.0.x` 在架构层面有很大的变更，因此笔者采取跟 Spring Boot 版本号一致的分支:
 
 * 2.4.x 分支适用于 `Spring Boot 2.4.x`，最低支持 JDK 1.8。

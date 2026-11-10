@@ -3,7 +3,7 @@ package org.ylzl.eden.demo.api;
 import org.ylzl.eden.demo.api.dto.MenuRequestDTO;
 import org.ylzl.eden.demo.api.dto.MenuResponseDTO;
 import org.ylzl.eden.demo.api.dto.MenuTreeDTO;
-import org.ylzl.eden.spring.framework.dto.MultiResult;
+import org.ylzl.eden.demo.api.dto.MultiResult;
 import org.ylzl.eden.spring.framework.dto.Result;
 import org.ylzl.eden.spring.framework.dto.SingleResult;
 

@@ -15,7 +15,7 @@ import org.ylzl.eden.demo.manager.dao.RbacManager;
 import org.ylzl.eden.demo.service.converter.MenuConvertor;
 import org.ylzl.eden.demo.service.converter.PermissionConvertor;
 import org.ylzl.eden.demo.service.converter.RoleConvertor;
-import org.ylzl.eden.spring.framework.dto.MultiResult;
+import org.ylzl.eden.demo.api.dto.MultiResult;
 import org.ylzl.eden.spring.framework.dto.PageResult;
 import org.ylzl.eden.spring.framework.dto.Result;
 import org.ylzl.eden.spring.framework.dto.SingleResult;
