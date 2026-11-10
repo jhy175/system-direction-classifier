@@ -36,9 +36,7 @@ import cn.edu.whu.irlab.systemdirectionclassifier.service.impl.UserServiceImpl;
 @DubboService(timeout = RPC.DEFAULT_TIMEOUT)
 public class UserProvider extends UserServiceImpl implements UserService {
 
-	public UserProvider(UserDAO userDAO, RbacManager rbacManager, UserConvertor userConvertor,
-						RoleConvertor roleConvertor, PermissionConvertor permissionConvertor,
-						MenuConvertor menuConvertor) {
-		super(userDAO, rbacManager, userConvertor, roleConvertor, permissionConvertor, menuConvertor);
-	}
+	public UserProvider(cn.edu.whu.irlab.systemdirectionclassifier.service.impl.IdentityLegacyAdapter adapter) {
+        super(adapter);
+    }
 }

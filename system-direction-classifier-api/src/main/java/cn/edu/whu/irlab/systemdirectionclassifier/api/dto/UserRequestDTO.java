@@ -1,27 +1,19 @@
 package cn.edu.whu.irlab.systemdirectionclassifier.api.dto;
-
 import lombok.*;
-
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-
-/**
- * 用户创建（数据传输对象）
- *
- * @author <a href="mailto:shiyindaxiaojie@gmail.com">gyl</a>
- * @since 2.4.13
- */
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
-@Data
+import com.fasterxml.jackson.databind.JsonNode;
+@Data @Builder @NoArgsConstructor @AllArgsConstructor @EqualsAndHashCode @ToString
 public class UserRequestDTO implements Serializable {
-
-	@NotBlank(message = "用户不能为空")
-	private String login;
-
-	@NotBlank(message = "邮箱不能为空")
-	private String email;
+    private String login;
+    private String displayName;
+    @ToString.Exclude private String password;
+    private String email;
+    private String phone;
+    private String avatarUrl;
+    private String organization;
+    private String department;
+    private Integer status;
+    private String langKey;
+    private String preferences;
+    private String remark;
 }

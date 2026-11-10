@@ -35,8 +35,7 @@ import cn.edu.whu.irlab.systemdirectionclassifier.service.impl.RoleServiceImpl;
 @DubboService(timeout = RPC.DEFAULT_TIMEOUT)
 public class RoleProvider extends RoleServiceImpl implements RoleService {
 
-	public RoleProvider(RoleDAO roleDAO, RbacManager rbacManager, RoleConvertor roleConvertor,
-						PermissionConvertor permissionConvertor, MenuConvertor menuConvertor) {
-		super(roleDAO, rbacManager, roleConvertor, permissionConvertor, menuConvertor);
-	}
+	public RoleProvider(cn.edu.whu.irlab.systemdirectionclassifier.service.impl.IdentityLegacyAdapter adapter) {
+        super(adapter);
+    }
 }

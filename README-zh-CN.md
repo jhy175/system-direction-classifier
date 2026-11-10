@@ -232,7 +232,7 @@ sequenceDiagram
 
 1. 在项目目录下运行 `mvn install`（如果不想运行测试，可以加上 `-DskipTests` 参数）。
 2. 进入 `system-direction-classifier-start` 目录，执行 `mvn spring-boot:run` 或者启动 `SystemDirectionClassifierApplication` 类。运行成功的话，可以看到 `Spring Boot` 启动成功的界面。
-3. 本应用中已经实现了一个简单的 `RestController` 接口，可以点击 [演示接口](http://localhost:8082/api/users/1) 进行调试。
+3. 用户相关接口现已鉴权。请先访问 [用户与团队](http://localhost:8082/identity/) 登录，再按 [接口说明](./docs/zh-CN/user-module-completion.md) 调用；匿名访问 `/api/users` 返回401属于预期行为。
 4. 由于目前的主流是前后端分离开发，请按需实现页面。访问 [http://localhost:8082](http://localhost:8082) 将跳转到 404 页面。
 
 ![](https://cdn.jsdelivr.net/gh/shiyindaxiaojie/cdn/common/404.png)
@@ -251,7 +251,7 @@ spring:
         enabled: true # 默认关闭，请按需开启
 ```
 
-**修改默认的数据源**：本项目默认使用 `H2` 内存数据库启动，基于 `Liquibase` 在项目启动时自动初始化 SQL 脚本。如果您使用的是外部的 MySQL 数据库，可以从此处调整下数据库的连接信息：[application-dev.yml](https://github.com/jhy175/system-direction-classifier/blob/main/system-direction-classifier-start/src/main/resources/config/application-dev.yml)，请删除任何与 `H2` 有关的配置。
+**数据库与用户模块**：当前本地启动脚本使用持久化 MySQL 和 `dev,mysql` 配置，已实现用户、角色、权限、菜单和团队管理。请按 [Windows 启动说明](./STARTUP-WINDOWS.md) 准备数据库；完整接口与验收范围见 [用户模块交付说明](./docs/zh-CN/user-module-completion.md)。
 
 ```yaml
 spring:

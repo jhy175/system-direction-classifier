@@ -1,150 +1,23 @@
 package cn.edu.whu.irlab.systemdirectionclassifier.service.impl;
-
-import com.github.pagehelper.Page;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import cn.edu.whu.irlab.systemdirectionclassifier.api.RoleService;
+import cn.edu.whu.irlab.systemdirectionclassifier.api.*;
 import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.*;
-import cn.edu.whu.irlab.systemdirectionclassifier.dao.RoleDAO;
-import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.MenuDO;
-import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.PermissionDO;
-import cn.edu.whu.irlab.systemdirectionclassifier.dao.database.dataobject.RoleDO;
-import cn.edu.whu.irlab.systemdirectionclassifier.manager.dao.RbacManager;
-import cn.edu.whu.irlab.systemdirectionclassifier.service.converter.MenuConvertor;
-import cn.edu.whu.irlab.systemdirectionclassifier.service.converter.PermissionConvertor;
-import cn.edu.whu.irlab.systemdirectionclassifier.service.converter.RoleConvertor;
 import cn.edu.whu.irlab.systemdirectionclassifier.api.dto.MultiResult;
-import org.ylzl.eden.spring.framework.dto.PageResult;
-import org.ylzl.eden.spring.framework.dto.Result;
-import org.ylzl.eden.spring.framework.dto.SingleResult;
-import org.ylzl.eden.spring.framework.error.ClientAssert;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-/**
- * 角色业务逻辑实现
- *
- * @author <a href="mailto:shiyindaxiaojie@gmail.com">gyl</a>
- * @since 2.4.14
- */
-@RequiredArgsConstructor
-@Slf4j
-@Service("roleService")
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.ylzl.eden.spring.framework.dto.*;
+import java.util.*;
+@Service("roleService") @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
-
-	private final RoleDAO roleDAO;
-	private final RbacManager rbacManager;
-	private final RoleConvertor roleConvertor;
-	private final PermissionConvertor permissionConvertor;
-	private final MenuConvertor menuConvertor;
-
-	@Override
-	public Result createRole(RoleRequestDTO dto) {
-		// 检查编码唯一性
-		RoleDO existing = roleDAO.findByCode(dto.getCode());
-		ClientAssert.isNull(existing, "ROLE-001");
-
-		RoleDO roleDO = roleConvertor.dtoToDataObject(dto);
-		roleDO.setStatus(1);
-		roleDO.setCreatedDate(LocalDateTime.now());
-		roleDAO.save(roleDO);
-		return Result.buildSuccess();
-	}
-
-	@Override
-	public Result modifyRole(Long id, RoleRequestDTO dto) {
-		RoleDO roleDO = roleDAO.findById(id);
-		ClientAssert.notNull(roleDO, "ROLE-002");
-
-		roleConvertor.updateDataObjectFromDTO(dto, roleDO);
-		roleDO.setLastModifiedDate(LocalDateTime.now());
-		roleDAO.updateById(roleDO);
-		return Result.buildSuccess();
-	}
-
-	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public Result removeRole(Long id) {
-		RoleDO roleDO = roleDAO.findById(id);
-		ClientAssert.notNull(roleDO, "ROLE-002");
-
-		// 级联删除关联关系
-		rbacManager.deleteRoleRelations(id);
-		roleDAO.deleteById(id);
-		return Result.buildSuccess();
-	}
-
-	@Override
-	public Result enableRole(Long id) {
-		RoleDO roleDO = roleDAO.findById(id);
-		ClientAssert.notNull(roleDO, "ROLE-002");
-		ClientAssert.isTrue(roleDO.getStatus() != 1, "ROLE-003");
-
-		roleDO.setStatus(1);
-		roleDO.setLastModifiedDate(LocalDateTime.now());
-		roleDAO.updateById(roleDO);
-		return Result.buildSuccess();
-	}
-
-	@Override
-	public Result disableRole(Long id) {
-		RoleDO roleDO = roleDAO.findById(id);
-		ClientAssert.notNull(roleDO, "ROLE-002");
-		ClientAssert.isTrue(roleDO.getStatus() != 0, "ROLE-004");
-
-		roleDO.setStatus(0);
-		roleDO.setLastModifiedDate(LocalDateTime.now());
-		roleDAO.updateById(roleDO);
-		return Result.buildSuccess();
-	}
-
-	@Override
-	public SingleResult<RoleResponseDTO> getRoleById(Long id) {
-		RoleDO roleDO = roleDAO.findById(id);
-		ClientAssert.notNull(roleDO, "ROLE-002");
-		return SingleResult.build(roleConvertor.dataObjectToDTO(roleDO));
-	}
-
-	@Override
-	public PageResult<RoleResponseDTO> listRoleByPage(RolePageQuery query) {
-		Page<RoleDO> page = roleDAO.findByPage(
-			query.getPageIndex(), query.getPageSize(),
-			query.getCode(), query.getName(), query.getStatus());
-		List<RoleResponseDTO> dtoList = roleConvertor.dataObjectListToDTOList(page.getResult());
-		return PageResult.build(dtoList, Integer.parseInt(String.valueOf(page.getTotal())));
-	}
-
-	@Override
-	public Result assignPermissions(Long roleId, List<Long> permissionIds) {
-		RoleDO roleDO = roleDAO.findById(roleId);
-		ClientAssert.notNull(roleDO, "ROLE-002");
-
-		rbacManager.assignPermissionsToRole(roleId, permissionIds);
-		return Result.buildSuccess();
-	}
-
-	@Override
-	public Result assignMenus(Long roleId, List<Long> menuIds) {
-		RoleDO roleDO = roleDAO.findById(roleId);
-		ClientAssert.notNull(roleDO, "ROLE-002");
-
-		rbacManager.assignMenusToRole(roleId, menuIds);
-		return Result.buildSuccess();
-	}
-
-	@Override
-	public MultiResult<PermissionResponseDTO> getRolePermissions(Long roleId) {
-		List<PermissionDO> permissions = rbacManager.getRolePermissions(roleId);
-		return MultiResult.build(permissionConvertor.dataObjectListToDTOList(permissions));
-	}
-
-	@Override
-	public MultiResult<MenuTreeDTO> getRoleMenus(Long roleId) {
-		List<MenuDO> menus = rbacManager.getRoleMenus(roleId);
-		List<MenuTreeDTO> tree = menuConvertor.buildMenuTree(menus);
-		return MultiResult.build(tree);
-	}
+    private final IdentityLegacyAdapter adapter;
+    @Override public Result createRole(RoleRequestDTO dto) { adapter.identity.create("roles",adapter.input(dto));return Result.buildSuccess(); }
+    @Override public Result modifyRole(Long id,RoleRequestDTO dto) { adapter.identity.update("roles",id,adapter.input(dto));return Result.buildSuccess(); }
+    @Override public Result removeRole(Long id) { adapter.identity.remove("roles",id);return Result.buildSuccess(); }
+    @Override public SingleResult<RoleResponseDTO> getRoleById(Long id) { return SingleResult.build(adapter.convert(adapter.identity.get("roles",id),RoleResponseDTO.class)); }
+    @Override public PageResult<RoleResponseDTO> listRoleByPage(RolePageQuery query) { return adapter.page("roles",query,RoleResponseDTO.class); }
+    @Override public Result enableRole(Long id) { adapter.state("roles",id,1);return Result.buildSuccess(); }
+    @Override public Result disableRole(Long id) { adapter.state("roles",id,0);return Result.buildSuccess(); }
+    @Override public Result assignPermissions(Long id,List<Long> ids) { adapter.identity.assign("roles",id,"permissions",ids);return Result.buildSuccess(); }
+    @Override public Result assignMenus(Long id,List<Long> ids) { adapter.identity.assign("roles",id,"menus",ids);return Result.buildSuccess(); }
+    @Override public MultiResult<PermissionResponseDTO> getRolePermissions(Long id) { return MultiResult.build(adapter.list(adapter.identity.relations("roles",id,"permissions"),PermissionResponseDTO.class)); }
+    @Override public MultiResult<MenuTreeDTO> getRoleMenus(Long id) { return MultiResult.build(adapter.list(adapter.identity.relations("roles",id,"menus"),MenuTreeDTO.class)); }
 }

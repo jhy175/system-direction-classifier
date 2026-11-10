@@ -230,7 +230,7 @@ This project is configured with a dev environment by default. For your convenien
 
 1. Run `mvn install` in the project directory (add `-DskipTests` parameter to skip tests).
 2. Navigate to `system-direction-classifier-start` directory, execute `mvn spring-boot:run` or start the `SystemDirectionClassifierApplication` class. If successful, you'll see the Spring Boot startup screen.
-3. A simple `RestController` interface is implemented in this application. Click [Demo API](http://localhost:8082/api/users/1) to test.
+3. User APIs now require authentication. Sign in through [Users and teams](http://localhost:8082/identity/) and follow the [API guide](./docs/zh-CN/user-module-completion.md); anonymous requests to `/api/users` return HTTP 401.
 4. Since frontend-backend separation is the mainstream approach, please implement pages as needed. Accessing [http://localhost:8082](http://localhost:8082) will redirect to a 404 page.
 
 ![](https://cdn.jsdelivr.net/gh/shiyindaxiaojie/cdn/common/404.png)
@@ -249,7 +249,7 @@ spring:
         enabled: true # Disabled by default, enable as needed
 ```
 
-**Modify Default Data Source**: This project uses `H2` in-memory database by default, with `Liquibase` automatically initializing SQL scripts at startup. If you're using an external MySQL database, adjust the connection information here: [application-dev.yml](https://github.com/jhy175/system-direction-classifier/blob/main/system-direction-classifier-start/src/main/resources/config/application-dev.yml), and remove any `H2` related configurations.
+**Database and identity module**: The local startup script now uses persistent MySQL with the `dev,mysql` profiles. See [Windows startup](./STARTUP-WINDOWS.md) and the [identity module delivery guide](./docs/zh-CN/user-module-completion.md) for database setup, authenticated APIs, team management, and verified scope.
 
 ```yaml
 spring:

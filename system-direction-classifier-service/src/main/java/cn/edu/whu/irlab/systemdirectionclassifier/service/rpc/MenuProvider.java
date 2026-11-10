@@ -33,7 +33,7 @@ import cn.edu.whu.irlab.systemdirectionclassifier.service.impl.MenuServiceImpl;
 @DubboService(timeout = RPC.DEFAULT_TIMEOUT)
 public class MenuProvider extends MenuServiceImpl implements MenuService {
 
-	public MenuProvider(MenuDAO menuDAO, RbacManager rbacManager, MenuConvertor menuConvertor) {
-		super(menuDAO, rbacManager, menuConvertor);
-	}
+	public MenuProvider(cn.edu.whu.irlab.systemdirectionclassifier.service.impl.IdentityLegacyAdapter adapter) {
+        super(adapter);
+    }
 }

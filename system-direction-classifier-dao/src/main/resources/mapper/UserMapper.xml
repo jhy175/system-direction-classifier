@@ -24,14 +24,28 @@
 		<result column="id" property="id"/>
 		<result column="login" property="login"/>
 		<result column="email" property="email"/>
-		<result column="password" property="passwordHash"/>
+		<result column="password_hash" property="passwordHash"/>
+		<result column="display_name" property="displayName"/>
+		<result column="phone" property="phone"/>
+		<result column="avatar_url" property="avatarUrl"/>
+		<result column="organization" property="organization"/>
+		<result column="department" property="department"/>
+		<result column="lang_key" property="langKey"/>
+		<result column="preferences" property="preferences"/>
+		<result column="last_login_at" property="lastLoginAt"/>
+		<result column="last_login_ip" property="lastLoginIp"/>
+		<result column="remark" property="remark"/>
+		<result column="created_by" property="createdBy"/>
+		<result column="updated_by" property="updatedBy"/>
 		<result column="status" property="status"/>
 		<result column="created_at" property="createdDate"/>
 		<result column="updated_at" property="lastModifiedDate"/>
 	</resultMap>
 
 	<sql id="baseColumns">
-		id, login, email, password, status, created_at, updated_at
+		id, login, display_name, email, password_hash, phone, avatar_url, organization,
+		department, lang_key, preferences, last_login_at, last_login_ip, remark,
+		status, created_by, updated_by, created_at, updated_at
 	</sql>
 
 	<select id="selectPage"

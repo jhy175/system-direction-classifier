@@ -78,3 +78,6 @@ log/
 .tools/
 build-*.log
 .mvn/settings.local.xml
+.local/
+__pycache__/
+*.pyc

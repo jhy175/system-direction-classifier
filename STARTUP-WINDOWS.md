@@ -1,30 +1,38 @@
 # Windows 本地启动
 
-在本项目根目录 `system-direction-classifier` 打开 PowerShell，每次启动运行：
+用户、权限和团队模块已接入持久化 MySQL；识别算法相关工作台仍保留演示数据。完整功能、接口与维护说明见 [用户模块交付说明](docs/zh-CN/user-module-completion.md)，验收结果见 [测试报告](docs/zh-CN/user-module-test-report.md)。
+
+在项目根目录打开 PowerShell：
 
 ```powershell
+# 准备或重新启动项目专用 MySQL（默认 127.0.0.1:3307）
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-mysql.ps1
+
+# 启动应用，使用 dev,mysql 配置
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start.ps1
 ```
 
-脚本使用项目本地 JDK 8，启用 `dev` 配置，将日志与临时文件放在 `logs` 下。在终端看到 `Started SystemDirectionClassifierApplication` 后，检查：
+启动后访问 [用户与团队](http://localhost:8082/identity/) 或 [识别工作台](http://localhost:8082/)。健康检查为 [运行状态](http://localhost:9082/actuator/health)。接口现已鉴权，直接匿名访问 /api/users 返回401属于预期行为。
+
+初始管理员账号和随机密码保存在本机 `.local/user-module.properties`，分别为 adminLogin 和 adminPassword。文件不进入 Git；不将实际密码复制到源码、说明文档或测试报告。后续通过页面修改密码后，以修改后的密码为准。
+
+业务库为 direction_classifier，独立测试库为 direction_classifier_test；数据库文件位于 `.tools/mysql/data`。普通应用重启不会清空用户、授权和团队数据，但需要重新登录。数据库未运行时先执行 setup-mysql.ps1；无需启动机器上其他 MySQL 服务、Redis 或 Nacos。
+
+修改源码后先停止项目应用，再构建，避免运行中的 JAR 被 Windows 占用：
 
 ```powershell
-Invoke-RestMethod http://localhost:9082/actuator/health
-Invoke-RestMethod 'http://localhost:8082/api/users?pageIndex=1&pageSize=10'
-```
-
-业务服务端口为 8082，监控端口为 9082。启动后访问 [学科交叉识别平台](http://localhost:8082/)，即可使用工作台及五个业务入口。前端暂时使用 mock 数据，操作记录保存在当前浏览器的 localStorage 中，不调用算法或模型服务。现有后端 API 保持可用。后端默认使用 H2 内存数据库，重启后数据库数据重置，无需另启 MySQL、Redis、Nacos。
-
-页面迁移说明、文件分工与验证方式见 [Web 页面说明](docs/zh-CN/classifier-ui.md)。
-
-前台运行时按 Ctrl+C 停止；已有实例运行时不要重复启动。
-
-修改源码后，在项目根目录重新打包，再启动：
-
-```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\stop-users.ps1
 . .\scripts\env.ps1
 $env:MAVEN_OPTS = '-Duser.home=C:\Users\JHY'
-mvn -B -ntp package '-DskipTests' '-Dmaven.javadoc.skip=true'
+mvn -B -ntp package '-Dmaven.javadoc.skip=true'
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start.ps1
 ```
 
-仅普通重启无需重新构建。构建命令跳过单元测试，启动验证以实际健康检查和接口响应为准。
+独立测试环境使用另一终端：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-users.ps1 -TestDatabase -Port 8083 -ManagementPort 9083
+python .\scripts\test-users.py
+```
+
+停止测试环境使用 `scripts/stop-users.ps1 -Port 8083`。停止两套环境后再重新打包。数据库与应用的本地配置和日志位置均见交付说明。

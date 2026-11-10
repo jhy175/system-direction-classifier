@@ -43,7 +43,7 @@ const openModal=(type,values={})=>{ui.modal=type;ui.modalValues=clone(values);re
 const closeModal=()=>{ui.modal=null;ui.modalValues={};$('#overlay').innerHTML=''};
 const crumbName=()=>({overview:'总览',methods:'识别方法',methodDetail:'方法详情',knowledge:'学科知识库',kbDetail:'知识库详情',debug:'单篇调试',batch:'批量识别',batchWizard:'新建批量任务',taskDetail:'任务详情',settings:'模型连接'})[ui.page]||'工作台';
 const currentSidePage=()=>['methodDetail'].includes(ui.page)?'methods':['kbDetail'].includes(ui.page)?'knowledge':['batchWizard','taskDetail'].includes(ui.page)?'batch':ui.page;
-const navbar=()=>{const nav=(page,label,icon)=>`<button type="button" class="side-link ${currentSidePage()===page?'active':''}" data-action="nav:${page}" title="${label}">${ic(icon)}<span class="nav-word">${label}</span></button>`;return `<aside class="sidebar"><div class="brand"><span class="brand-mark">${ic('workflow',31)}</span><span class="brand-word">学科交叉识别平台</span></div><div class="side-section-label">工作空间</div>${nav('overview','总览','home')}${nav('debug','单篇调试','flask')}${nav('batch','批量识别','layers')}<div class="side-section-label">资源与配置</div>${nav('methods','识别方法','workflow')}${nav('knowledge','学科知识库','book')}<div class="side-bottom">${nav('settings','模型连接','settings')}<div class="side-footer">DESIGN PROTOTYPE · 2026</div></div></aside>`};
+const navbar=()=>{const nav=(page,label,icon)=>`<button type="button" class="side-link ${currentSidePage()===page?'active':''}" data-action="nav:${page}" title="${label}">${ic(icon)}<span class="nav-word">${label}</span></button>`;return `<aside class="sidebar"><div class="brand"><span class="brand-mark">${ic('workflow',31)}</span><span class="brand-word">学科交叉识别平台</span></div><div class="side-section-label">工作空间</div>${nav('overview','总览','home')}${nav('debug','单篇调试','flask')}${nav('batch','批量识别','layers')}<div class="side-section-label">资源与配置</div>${nav('methods','识别方法','workflow')}${nav('knowledge','学科知识库','book')}<div class="side-bottom">${nav('settings','模型连接','settings')}<a href="/identity/" class="side-link"><span class="nav-word">用户与团队</span></a><div class="side-footer">DESIGN PROTOTYPE · 2026</div></div></aside>`};
 const topbar=()=>`<header class="topbar"><div class="crumbs"><span>工作空间</span><span>/</span>${['methodDetail','kbDetail','taskDetail','batchWizard'].includes(ui.page)?`<span>${ui.page==='methodDetail'?'识别方法':ui.page==='kbDetail'?'学科知识库':'批量识别'}</span><span>/</span>`:''}<strong>${esc(crumbName())}</strong></div><div class="top-actions"><button class="search-pill" data-action="globalSearch">${ic('search',15)}<span>搜索方法、任务或知识库</span><kbd>Ctrl K</kbd></button><button class="icon-button" title="原型使用说明" data-action="help">${ic('question',19)}</button><div class="avatar" title="演示账号">研</div></div></header>`;
 const pageHead=(eyebrow,title,sub,actions='')=>`<div class="page-head"><div><div class="eyebrow">${eyebrow}</div><h1 class="page-title">${title}</h1><p class="page-sub">${sub}</p></div><div class="head-actions">${actions}</div></div>`;
 const empty=(title,desc,action='')=>`<div class="empty"><div class="empty-icon">${ic('search',22)}</div><div class="empty-title">${title}</div><div class="empty-desc">${desc}</div>${action}</div>`;
@@ -292,4 +292,10 @@ function restoreRoute(){
 window.addEventListener('popstate',restoreRoute);
 window.addEventListener('hashchange',restoreRoute);
 restoreRoute();
+// Load only the signed-in user's display preference; algorithm fixtures remain local demo data.
+fetch('/api/auth/me',{credentials:'same-origin'}).then(response=>response.ok?response.json():null).then(result=>{
+ if(result?.success&&typeof result.data?.preferences?.advancedConfig==='boolean'){
+  ui.methodAdvanced=result.data.preferences.advancedConfig;render();
+ }
+}).catch(()=>{});
 })();

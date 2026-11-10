@@ -33,8 +33,7 @@ import cn.edu.whu.irlab.systemdirectionclassifier.service.impl.PermissionService
 @DubboService(timeout = RPC.DEFAULT_TIMEOUT)
 public class PermissionProvider extends PermissionServiceImpl implements PermissionService {
 
-	public PermissionProvider(PermissionDAO permissionDAO, RbacManager rbacManager,
-							  PermissionConvertor permissionConvertor) {
-		super(permissionDAO, rbacManager, permissionConvertor);
-	}
+	public PermissionProvider(cn.edu.whu.irlab.systemdirectionclassifier.service.impl.IdentityLegacyAdapter adapter) {
+        super(adapter);
+    }
 }
