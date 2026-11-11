@@ -10,6 +10,8 @@ function boot(hash = '', storage = new Map()) {
   const node = id => nodes[id] ||= {innerHTML: '', append() {}, remove() {}};
   const location = {hash};
   const window = {location, scrollTo() {}, addEventListener(type, fn) {windowListeners[type] = fn;}};
+  // Knowledge interactions are tested against the live application and MySQL.
+  window.ClassifierKnowledge = {catalog: async () => [], search() {}, mount() {}};
   window.history = {pushState(_, __, url) {location.hash = url;}, replaceState(_, __, url) {location.hash = url;}};
   const document = {
     querySelector: node,
@@ -19,7 +21,7 @@ function boot(hash = '', storage = new Map()) {
   };
   const context = vm.createContext({window, document, URLSearchParams, console,
     localStorage: {getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value)},
-    setTimeout() {}, Blob, URL});
+    setTimeout() {}, Blob, URL, fetch: async () => ({ok:false})});
   for (const name of ['mock-data.js', 'mock-store.js', 'router.js', 'app.js']) {
     vm.runInContext(fs.readFileSync(path.join(assets, name), 'utf8'), context, {filename: name});
   }
@@ -39,7 +41,7 @@ const app = boot();
 assert.match(app.html(), /工作台总览/);
 for (const route of ['methods', 'knowledge', 'debug', 'batch', 'settings']) {
   app.click('nav:' + route);
-  assert.match(app.html(), /class="page-title"/);
+  assert.match(app.html(), route === 'knowledge' ? /id="knowledge-page"/ : /class="page-title"/);
 }
 app.click('methodOpen:m1');
 app.change('method:router:maxClusters', 6, 'number');
@@ -69,12 +71,9 @@ assert.match(app.html(), /待重算/);
 assert.equal(app.saved().histories[0].adjustments.length, 0);
 app.click('dbgRestore');
 
-app.click('kbOpen:kb1');
-app.click('kbCreateDraft');
-app.change('kb:profile:1201:definition', '更新定义');
-app.click('kbSaveDraft');
-assert.equal(app.saved().kbs[0].draft.resources.summaries[0].stale, true);
-assert.notEqual(app.saved().kbs[0].versions[0].resources.profiles[0].definition, '更新定义');
+const legacyStorage = new Map([['direction-classifier.mock.v1',
+  JSON.stringify({...app.saved(), kbs:[{id:'old-mock-knowledge'}]})]]);
+assert.equal(boot('#knowledge', legacyStorage).saved().kbs, undefined);
 
 app.click('nav:batch');
 app.click('batchNew');
@@ -104,4 +103,4 @@ assert.match(app.html(), /工作台总览/);
 const restored = boot('#debug?dbgMethodId=m1&dbgVersion=v2.3', app.storage);
 assert.match(restored.html(), /value="v2.3" selected/);
 boot('', new Map([['direction-classifier.mock.v1', '{invalid']]));
-console.log('PASS: navigation, bookmarks, versions, draft guard, debug snapshots, knowledge staleness, batch validation, model connections and storage fallback');
+console.log('PASS: navigation, bookmarks, versions, draft guard, debug snapshots, legacy knowledge cleanup, batch validation, model connections and storage fallback');

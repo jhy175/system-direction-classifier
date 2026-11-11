@@ -18,3 +18,14 @@ button:focus-visible,a:focus-visible{outline:2px solid #79a78a;outline-offset:2p
 .debug-area.debug-unrun{grid-template-columns:minmax(0,1fr)}
 .debug-area.debug-unrun .result-overview{display:none}
 .debug-area.debug-unrun .debug-form{width:100%;max-width:920px}
+.kb-filter { display:flex; flex-wrap:wrap; gap:10px; }
+.kb-filter > input { width:min(240px,100%); }
+.kb-dialog { width:min(720px,calc(100vw - 32px)); max-height:90vh; padding:0; border:1px solid #dce6de; border-radius:12px; color:inherit; }
+.kb-dialog::backdrop { background:#18241d66; }
+.kb-dialog .modal-body { max-height:67vh; overflow:auto; }
+.kb-dialog [data-kb-error]:empty { display:none; }
+.kb-text { white-space:pre-wrap; overflow-wrap:anywhere; max-height:320px; overflow:auto; line-height:1.65; }
+.kb-issues, .kb-paper-links { max-height:270px; overflow:auto; }
+.kb-paper-links > div { display:flex; justify-content:space-between; gap:12px; padding:6px 0; }
+[data-kb-portrait] summary { cursor:pointer; padding:5px 0; }
+[data-kb-portrait] h3 { margin:16px 0 6px; font-size:14px; }

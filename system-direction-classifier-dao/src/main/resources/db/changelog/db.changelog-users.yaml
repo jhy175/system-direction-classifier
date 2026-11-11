@@ -9,3 +9,12 @@ databaseChangeLog:
             relativeToChangelogFile: true
             encoding: UTF-8
             splitStatements: true
+  - include:
+      file: knowledge/3.0.0-schema.sql
+      relativeToChangelogFile: true
+  - include:
+      file: knowledge/3.0.0-version-guards.sql
+      relativeToChangelogFile: true
+  - include:
+      file: knowledge/3.0.1-builtin-owner.sql
+      relativeToChangelogFile: true

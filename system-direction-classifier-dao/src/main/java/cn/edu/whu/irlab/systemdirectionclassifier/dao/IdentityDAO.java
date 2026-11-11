@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** Parameterized JDBC for identity aggregates, including explicit SQL NULL updates. */
+/** Parameterized JDBC for identity and knowledge aggregates. */
 @Repository
 @RequiredArgsConstructor
 public class IdentityDAO {
@@ -19,13 +19,17 @@ public class IdentityDAO {
     private final ObjectMapper json;
     private static final Set<String> TABLES = new HashSet<>(Arrays.asList(
         "demo_user","demo_role","demo_permission","demo_menu","demo_user_role",
-        "demo_role_permission","demo_role_menu","demo_team","demo_team_member"));
+        "demo_role_permission","demo_role_menu","demo_team","demo_team_member",
+        "demo_discipline","demo_knowledge_base","demo_knowledge_version","demo_knowledge_discipline",
+        "demo_knowledge_summary","demo_knowledge_cluster","demo_knowledge_cluster_member",
+        "demo_knowledge_seed_paper","demo_seed_paper_discipline","demo_knowledge_asset",
+        "demo_file_asset","demo_asset_reference","demo_knowledge_import","demo_knowledge_import_item"));
     private String table(String name) {
-        if (!TABLES.contains(name)) throw new IllegalArgumentException("Unknown identity table");
+        if (!TABLES.contains(name)) throw new IllegalArgumentException("Unknown business table");
         return name;
     }
     private String column(String name) {
-        if (!name.matches("[a-z][a-z_]*")) throw new IllegalArgumentException("Invalid column");
+        if (!name.matches("[a-z][a-z0-9_]*")) throw new IllegalArgumentException("Invalid column");
         return name;
     }
     public List<Map<String,Object>> query(String sql, Object... args) {
