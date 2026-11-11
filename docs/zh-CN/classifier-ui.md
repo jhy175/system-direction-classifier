@@ -1,6 +1,6 @@
 # 学科交叉识别平台 Web 页面
 
-原型 `ADE791BAE589AFE5ABB9E5B0_HTMLBAE781/interdisciplinary_ui` 的界面与交互已迁入现有 Maven 工程的 Web 模块。保留原型的配色、双分支流程图、配置面板、表格、弹窗和抽屉，无需 npm、CDN 或独立前端服务。
+工作台由现有 Maven 工程的 Web 模块提供。识别方法、知识库和模型连接读取 MySQL 业务库。页面沿用原型的配色、流程配置面板、表格和弹窗，无需 npm、CDN 或独立前端服务。
 
 ## 启动与入口
 
@@ -10,10 +10,10 @@
 | --- | --- |
 | 总览 | `#overview` |
 | 识别方法 | `#methods` |
-| 方法流程及版本 | `#methodDetail?methodId=m1&methodVersion=v2.3&methodView=version&methodTab=flow&methodStage=router` |
+| 方法流程及版本 | `#methodDetail?methodId=1&methodVersion=1&methodView=version&methodTab=flow&methodStage=router`，参数使用数据库中的方法 ID 和版本 ID |
 | 学科知识库 | `#knowledge` |
 | 知识库资源及版本 | `#kbDetail?kbId=kb1&kbVersion=v1.6&kbVersionMode=version&kbTab=profiles` |
-| 单篇调试 | `#debug?dbgMethodId=m1&dbgVersion=v2.3` |
+| 单篇调试 | `#debug?dbgMethodId=1&dbgVersion=v1` |
 | 批量任务 | `#batch` |
 | 新建批量任务 | `#batchWizard` |
 | 任务详情 | `#taskDetail?batchTaskId=t1` |
@@ -29,26 +29,22 @@
 | --- | --- |
 | `index.html` | 系统首页及脚本装配 |
 | `classifier/style.css` | 原型样式和响应式布局 |
-| `classifier/app.js` | 页面渲染、表单、流程配置、调试与任务交互 |
-| `classifier/mock-data.js` | 方法、知识库、模型连接、任务的初始演示数据 |
-| `classifier/mock-store.js` | mock 数据本地读写、独立存储命名空间、凭据字段排除 |
+| `classifier/app.js` | 工作区导航、总览及单篇、批量演示交互 |
+| `classifier/methods.js` | 通过 `/api/methods` 读取和维护方法、草稿与版本 |
+| `classifier/mock-data.js` | 批量任务的初始演示数据 |
+| `classifier/mock-store.js` | 单篇调试历史与批量演示记录的本地读写 |
 | `classifier/router.js` | 页面、对象 ID、版本、页签与阶段的 hash 路由 |
 
-目前是 Web 层的 mock 演示，不增加无实际业务逻辑的 Service、Manager 或 DAO 占位实现，也不依赖相邻 Python 算法工程。后续接入时，将持久化与模拟识别动作替换为 Web Controller → Service → Manager/DAO 或算法客户端调用；页面的版本、资源、模型连接和运行快照仍保持各自边界。
+方法新建从已导入的内置方法初始化六阶段草稿。保存新版本时固定知识版本和阶段模型修订，并校验提示词变量与参数。方法列表和详情支持筛选、复制已保存版本、归档与恢复、默认版本设置和从历史版本创建草稿。
 
-## mock 行为
+## 单篇与批量演示
 
-- 方法、知识库均通过独立草稿编辑，保存版本时复制快照并填写说明。
-- 方法保存版本引用特定知识库版本，知识库更新不会自动改写旧方法。
-- 单篇结果、人工干预、历史快照及重跑均为模拟，未执行真实模型推理。
-- 知识库生成采用预览、确认写入草稿流程，编辑画像会标记摘要待更新。
+- 方法和版本选择来自业务库。单篇结果、人工干预、历史快照及重跑使用模拟数据。
 - 批量任务支持 UTF-8 CSV、字段映射、异常行检查、明确跳过异常行、模拟执行与 CSV 导出；暂不支持 XLSX。
-- 部分资源导入入口保留原型的说明弹窗，尚未接入实际文件写入；资源可通过表单编辑及 JSON 导出。
-- 模型连通性测试为演示状态，API Key 输入禁用，不保存真实凭据。
-- 本地存储键为 `direction-classifier.mock.v1`，与原型的 `ici-demo-v7` 隔离。删除这一键并刷新可恢复初始演示数据；不同浏览器之间不共享数据。
+- 本地存储键 `direction-classifier.mock.v1` 保存单篇和批量演示记录。新版首次读取时会清除该键下的旧方法 mock 数据。
 
 ## 验证
 
-在项目根目录运行 `node scripts/check-classifier-ui.cjs`，无须安装 npm 依赖。检查页面导航、书签恢复、版本不可变、未保存离开提示、人工调整与历史快照隔离、资源待更新、批量异常数据和连接编辑。
+在项目根目录运行 `node scripts/check-classifier-ui.cjs`，检查路由、业务库方法引用、本地 mock 清理及单篇和批量演示。对连接 `direction_classifier_test` 且已导入内置方法的 8083 应用，运行 `python scripts/test-methods.py` 验证新建、保存草稿、版本发布、授权与归档。
 
 Maven 打包与原工程一致；页面资源通过标准 Spring Boot 静态资源机制发布，已有 `/api/*` 与 `/actuator/*` 不受页面路由影响。

@@ -27,19 +27,22 @@ public class ModelConnectionManager {
     private static final String TEST = "demo_model_connection_test";
     private static final String REVISION_COLUMNS = "r.id AS revision_id,r.revision_no,r.protocol_code,r.provider_code," +
         "r.model_type,r.base_url,r.model_id,r.auth_type,r.adapter_options_json,r.routing_options_json";
-    private static final String CATALOG =
+    private static final String CATALOG_SELECT =
         "SELECT c.id,c.name,c.description,c.owner_user_id,c.visibility,c.team_id,c.status,c.updated_at," +
         "DATE_FORMAT(c.updated_at,'%Y-%m-%dT%H:%i:%s.%f') AS edit_token,u.login AS owner_login," +
         "u.display_name AS owner_name,tm.name AS team_name," + REVISION_COLUMNS + "," +
         "(k.id IS NOT NULL) AS credential_configured,t.call_status AS last_call_status,t.tested_at AS last_tested_at," +
         "t.http_status AS last_http_status,t.error_code AS last_error_code " +
-        "FROM demo_model_connection c JOIN demo_model_connection_revision r ON r.id=c.current_revision_id " +
+        "FROM demo_model_connection c JOIN demo_model_connection_revision r ";
+    private static final String CATALOG_JOINS =
         "JOIN demo_user u ON u.id=c.owner_user_id LEFT JOIN demo_team tm ON tm.id=c.team_id " +
         "LEFT JOIN demo_model_credential k ON k.connection_id=c.id AND k.credential_scope_key=r.credential_scope_key " +
         "AND k.active_slot=1 AND r.auth_type<>'none' " +
         "LEFT JOIN demo_model_connection_test t ON t.id=(SELECT x.id FROM demo_model_connection_test x " +
         "WHERE x.connection_revision_id=r.id AND x.credential_id <=> k.id AND x.tested_base_url=r.base_url " +
         "ORDER BY x.tested_at DESC,x.id DESC LIMIT 1) ";
+    private static final String CATALOG = CATALOG_SELECT + "ON r.id=c.current_revision_id " + CATALOG_JOINS;
+    private static final String REVISION_CATALOG = CATALOG_SELECT + "ON r.connection_id=c.id " + CATALOG_JOINS;
     private static final String TEST_COLUMNS = "id,connection_revision_id,tested_base_url,tested_at,reachable,call_status," +
         "http_status,duration_ms,provider_request_id,returned_model_id,usage_json,response_preview,error_code,error_message";
 
@@ -72,8 +75,16 @@ public class ModelConnectionManager {
 
     @Transactional(readOnly = true)
     public List<Map<String,Object>> options() {
+        return options(Collections.emptySet());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String,Object>> options(Set<Long> pinnedRevisions) {
         Access access = access();
-        return db.query(CATALOG + "WHERE c.status='enabled' ORDER BY c.name,c.id").stream()
+        String extra = pinnedRevisions.isEmpty() ? "" : " OR r.id IN (" +
+            String.join(",", Collections.nCopies(pinnedRevisions.size(), "?")) + ")";
+        return db.query(REVISION_CATALOG + "WHERE c.status='enabled' AND (r.id=c.current_revision_id" + extra +
+            ") ORDER BY c.name,c.id,r.revision_no DESC", pinnedRevisions.toArray()).stream()
             .filter(row -> access.uses(row) && ("none".equals(row.get("authType")) || truth(row.get("credentialConfigured"))))
             .filter(row -> !"failed".equals(row.get("lastCallStatus")))
             .map(row -> fields("revisionId", row.get("revisionId"), "revisionNo", row.get("revisionNo"),

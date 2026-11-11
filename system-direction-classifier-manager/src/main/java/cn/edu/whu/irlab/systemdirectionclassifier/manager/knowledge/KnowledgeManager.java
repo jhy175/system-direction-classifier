@@ -91,6 +91,39 @@ public class KnowledgeManager {
             "validation", resources.validate(versionId), "assets", files.list(versionId));
     }
 
+    public List<Map<String,Object>> methodVersions(long taxonomyId) {
+        Access access = access("knowledge:read");
+        List<Map<String,Object>> choices = new ArrayList<>();
+        for (Map<String,Object> base : db.query(BASE_QUERY + "WHERE b.taxonomy_id=? AND b.archived_at IS NULL ORDER BY b.name,b.id", taxonomyId)) {
+            if (!access.canUse(base)) continue;
+            choices.addAll(db.query("SELECT v.id,v.knowledge_base_id,b.name AS knowledge_name,v.version_no," +
+                "(v.id=b.default_version_id) AS is_default FROM demo_knowledge_version v " +
+                "JOIN demo_knowledge_base b ON b.id=v.knowledge_base_id " +
+                "WHERE v.knowledge_base_id=? AND v.state='saved' ORDER BY v.version_no DESC", id(base, "id")));
+        }
+        return choices;
+    }
+
+    public Map<String,Object> methodResources(long taxonomyId, long versionId) {
+        Access access = access("knowledge:read");
+        Map<String,Object> row = db.one("SELECT b.*,v.manifest_hash FROM demo_knowledge_version v " +
+            "JOIN demo_knowledge_base b ON b.id=v.knowledge_base_id " +
+            "WHERE v.id=? AND v.taxonomy_id=? AND v.state='saved' AND b.archived_at IS NULL", versionId, taxonomyId);
+        if (row == null || !access.canUse(row)) throw missing();
+        List<Map<String,Object>> summaries = db.query("SELECT p.code_snapshot," +
+            "JSON_UNQUOTE(JSON_EXTRACT(s.source_locator_json,'$.json_pointer')) AS source_locator " +
+            "FROM demo_knowledge_summary s JOIN demo_knowledge_discipline p ON p.id=s.knowledge_discipline_id " +
+            "WHERE s.knowledge_version_id=? ORDER BY p.code_snapshot", versionId);
+        // Imported arrays have JSON pointers such as /0. New entries follow the imported entries in code order.
+        summaries.sort(Comparator.comparingLong(item -> summaryPosition((String)item.get("sourceLocator"))));
+        return fields("manifestHash", row.get("manifestHash"), "validation", resources.validate(versionId),
+            "fallbackOrder", summaries.stream().map(item -> item.get("codeSnapshot")).collect(Collectors.toList()));
+    }
+
+    private static long summaryPosition(String locator) {
+        return locator != null && locator.matches("/[0-9]{1,9}") ? Long.parseLong(locator.substring(1)) : Long.MAX_VALUE;
+    }
+
     public Object portrait(long baseId, long versionId, long profileId) {
         Access access = access("knowledge:read");
         version(base(baseId, access, false), versionId, access);
@@ -396,9 +429,11 @@ public class KnowledgeManager {
             return grants.getOrDefault(id(base, "id"), Collections.emptySet());
         }
         boolean canRead(Map<String,Object> base) {
+            return canUse(base) || !Collections.disjoint(grants(base), Arrays.asList("read", "edit", "publish"));
+        }
+        boolean canUse(Map<String,Object> base) {
             return owner(base) || "builtin".equals(base.get("visibility")) ||
-                ("team".equals(base.get("visibility")) && teamIds.contains(id(base, "teamId"))) ||
-                !Collections.disjoint(grants(base), Arrays.asList("read", "use", "edit", "publish"));
+                ("team".equals(base.get("visibility")) && teamIds.contains(id(base, "teamId"))) || grants(base).contains("use");
         }
         boolean canEdit(Map<String,Object> base) {
             return base.get("archivedAt") == null && has("knowledge:edit") &&

@@ -1,128 +1,102 @@
-/* Dependency-free interaction smoke checks for the mock Web application. */
+/* Dependency-free checks for workspace routing and demo execution pages. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const assets = path.join(__dirname, '../system-direction-classifier-web/src/main/resources/public/classifier');
+const tick = () => new Promise(setImmediate);
+const version = {id:7,versionNo:1,state:'saved',knowledgeName:'学科知识库',knowledgeVersionNo:1};
+const method = {id:5,name:'业务库识别方法',ownerLogin:'admin',taxonomyName:'教育部',defaultNumber:1,latestNumber:1,
+  defaultVersionId:7,latestVersionId:7,versions:[version]};
 
-function boot(hash = '', storage = new Map()) {
+function boot(hash = '', storage = new Map(), offline = false) {
   const listeners = {}, windowListeners = {}, nodes = {};
-  const node = id => nodes[id] ||= {innerHTML: '', append() {}, remove() {}};
+  const node = id => nodes[id] ||= {innerHTML:'',append() {},remove() {}};
   const location = {hash};
-  const window = {location, scrollTo() {}, addEventListener(type, fn) {windowListeners[type] = fn;}};
-  // Service-backed pages are exercised against MySQL. These stubs only support the method UI.
-  window.ClassifierKnowledge = {catalog: async () => [{id:'kb-live', name:'学科知识库', defaultVersion:'v1'}],
-    versions: async () => [{number:'v1'}], search() {}, mount() {}};
-  window.ClassifierModelConnections = {options: async () => [
-    {revisionId:61, revisionNo:3, name:'对话连接', modelId:'chat', modelType:'chat'}
-  ], mount() {}, unmount() {}, dismiss() {return false;}};
-  window.history = {pushState(_, __, url) {location.hash = url;}, replaceState(_, __, url) {location.hash = url;}};
-  const document = {
-    querySelector: node,
-    createElement() {return {click() {}, remove() {}};},
-    body: {append() {}},
-    addEventListener(type, fn) {(listeners[type] ||= []).push(fn);}
+  const window = {location,scrollTo() {},addEventListener(type,fn) {windowListeners[type]=fn;}};
+  window.ClassifierKnowledge = {search() {},mount() {}};
+  window.ClassifierModelConnections = {mount() {},unmount() {},dismiss() {return false;}};
+  window.history = {pushState(_,__,url) {location.hash=url;},replaceState(_,__,url) {location.hash=url;}};
+  const document = {querySelector:node,createElement() {return {click() {},remove() {}};},
+    body:{append() {}},addEventListener(type,fn) {(listeners[type] ||= []).push(fn);}};
+  const fetch = async url => {
+    const get = (data, ok = true) => ({ok,status:ok?200:404,json:async()=>({success:ok,data,message:ok?'':'方法不可见'})});
+    if (offline) return get(null,false);
+    if (url === '/api/methods/options') return get([method]);
+    if (url.startsWith('/api/methods?')) return get({items:[method],taxonomies:[],canCreate:true,total:1,page:1,pageSize:20});
+    if (url === '/api/methods/5') return get(method);
+    if (url === '/api/methods/5/versions/7') return get({...version,stages:[]});
+    return get(null,false);
   };
-  const context = vm.createContext({window, document, URLSearchParams, console,
-    localStorage: {getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value)},
-    setTimeout() {}, Blob, URL, fetch: async () => ({ok:false})});
-  for (const name of ['mock-data.js', 'mock-store.js', 'router.js', 'app.js']) {
-    if (name === 'app.js') {
-      const fixtures = window.ClassifierMockData;
-      window.ClassifierMockData = {...fixtures, seedData() {
-        const data = fixtures.seedData();
-        data.methods[0].kbId = 'kb-live';
-        data.methods[0].draft.knowledgeVersion = 'v1';
-        return data;
-      }};
-    }
-    vm.runInContext(fs.readFileSync(path.join(assets, name), 'utf8'), context, {filename: name});
+  const context = vm.createContext({window,document,URLSearchParams,console,fetch,Blob,URL,setTimeout() {},
+    localStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)}});
+  for (const name of ['mock-data.js','mock-store.js','router.js','methods.js','app.js']) {
+    vm.runInContext(fs.readFileSync(path.join(assets,name),'utf8'),context,{filename:name});
   }
-  const event = (type, target) => listeners[type].forEach(fn => fn({target, preventDefault() {}}));
+  const event = (type,target) => listeners[type].forEach(fn=>fn({target,preventDefault() {}}));
   return {
-    storage, window,
-    html: () => nodes['#app'].innerHTML,
-    overlay: () => nodes['#overlay'].innerHTML,
-    click(action) {event('click', {closest: () => ({dataset: {action}})});},
-    change(bind, value, type = 'text') {event('change', {dataset: {bind}, value, type});},
-    route(hash) {location.hash = hash; windowListeners.popstate();},
-    saved: () => JSON.parse(storage.get('direction-classifier.mock.v1'))
+    html:()=>nodes['#app'].innerHTML,
+    methodHtml:()=>nodes['#method-page'].innerHTML,
+    click(action) {event('click',{closest:()=>({dataset:{action}})});},
+    methodClick(action) {nodes['#method-page'].onclick({target:{closest:()=>({dataset:{methodAction:action}})}});},
+    change(bind,value,type='text') {event('change',{dataset:{bind},value,type});},
+    route(value) {location.hash=value;windowListeners.popstate();},
+    saved:()=>JSON.parse(storage.get('direction-classifier.mock.v1'))
   };
 }
 
 async function run() {
-  const app = boot();
-  await new Promise(setImmediate);
-  assert.match(app.html(), /工作台总览/);
-  for (const route of ['methods', 'knowledge', 'debug', 'batch', 'settings']) {
-    app.click('nav:' + route);
-    assert.match(app.html(), route === 'knowledge' ? /id="knowledge-page"/ : /class="page-title"/);
-  }
-  app.click('methodOpen:m1');
-  assert.match(app.html(), /对话连接 · chat · 修订 3/);
-  for (const stage of ['router', 'recall', 'judge']) app.change('method:' + stage + ':model', '61');
-  app.change('method:router:maxClusters', 6, 'number');
-  app.click('nav:knowledge');
-  assert.match(app.overlay(), /草稿/);
-  app.click('leaveSave');
-  const oldVersion = JSON.stringify(app.saved().methods[0].versions[0]);
-  assert.equal(app.saved().methods[0].draft.config.router.maxClusters, 6);
-  app.click('methodOpen:m1');
-  app.click('methodSaveVersion');
-  app.change('modal:summary', '测试保存新版本');
-  app.click('methodCommitVersion');
-  assert.equal(app.saved().methods[0].versions[0].number, 'v2.4');
-  assert.equal(JSON.stringify(app.saved().methods[0].versions[1]), oldVersion);
-  const bookmarked = app.window.location.hash;
-  assert.match(boot(bookmarked, app.storage).html(), /已保存 v2.4/);
-
-  app.click('methodDebugVersion:v2.3');
+  const storage = new Map([['direction-classifier.mock.v1',JSON.stringify({methods:[{name:'过期演示方法'}],tasks:[],histories:[]})]]);
+  const app = boot('',storage);
+  await tick();
+  assert.match(app.html(),/工作台总览/);
+  assert.match(app.html(),/业务库识别方法/);
+  assert.equal(app.saved().methods,undefined);
+  app.click('nav:methods');
+  await tick();
+  assert.match(app.methodHtml(),/业务库识别方法/);
+  assert.doesNotMatch(app.methodHtml(),/过期演示方法/);
+  app.methodClick('open:5');
+  await tick();
+  assert.match(app.methodHtml(),/已保存 v1/);
+  app.route('#methodDetail?methodId=404');
+  await tick();
+  assert.match(app.methodHtml(),/方法不可见/);
+  app.click('nav:debug');
+  assert.match(app.html(),/业务库识别方法/);
   app.click('dbgSample');
   app.click('dbgRun');
-  assert.match(app.html(), /0.63/);
   app.click('dbgSaveHistory');
-  assert.equal(app.saved().histories[0].version, 'v2.3');
+  assert.equal(app.saved().histories[0].version,'v1');
   app.click('dbgAddCandidate');
   app.click('dbgApplyCandidate');
-  assert.match(app.html(), /待重算/);
-  assert.equal(app.saved().histories[0].adjustments.length, 0);
-  app.click('dbgRestore');
-
-  const legacy = app.saved();
-  legacy.kbs = [{id:'old-mock-knowledge'}];
-  legacy.connections = [{id:'c123', model:'old-demo-model'}];
-  legacy.methods[0].versions[1].config.router.model = 'c123';
-  const legacyStorage = new Map([['direction-classifier.mock.v1', JSON.stringify(legacy)]]);
-  const migrated = boot('#knowledge', legacyStorage).saved();
-  assert.equal(migrated.kbs, undefined);
-  assert.equal(migrated.connections, undefined);
-  assert.equal(migrated.methods[0].versions[1].config.router.model, '');
-  assert.equal(migrated.methods[0].versions[0].config.router.model, '61');
+  assert.match(app.html(),/待重算/);
+  assert.equal(app.saved().histories[0].adjustments.length,0);
 
   app.click('nav:batch');
   app.click('batchNew');
-  app.change('batch:name', '批量演示任务');
+  assert.match(app.html(),/业务库识别方法/);
+  app.change('batch:name','批量演示任务');
   app.click('batchNext');
   app.click('batchSample');
-  assert.match(app.html(), /编号重复/);
-  app.change('batch:skipInvalid', true, 'checkbox');
+  assert.match(app.html(),/编号重复/);
+  app.change('batch:skipInvalid',true,'checkbox');
   app.click('batchNext');
   app.click('batchSubmit');
-  assert.equal(app.saved().tasks[0].total, 3);
-  app.click('taskSimulate:' + app.saved().tasks[0].id);
-  assert.equal(app.saved().tasks[0].success, 3);
+  assert.equal(app.saved().tasks[0].total,3);
+  app.click('taskSimulate:'+app.saved().tasks[0].id);
+  assert.equal(app.saved().tasks[0].success,3);
+  assert.equal(app.saved().methods,undefined);
 
+  app.click('nav:knowledge');
+  assert.match(app.html(),/id="knowledge-page"/);
   app.click('nav:settings');
-  assert.match(app.html(), /id="model-connection-page"/);
-  assert.equal(app.saved().connections, undefined);
-  app.route('#methodDetail?methodId=missing');
-  assert.match(app.html(), /管理识别流程/);
-  app.route('#unknown');
-  assert.match(app.html(), /工作台总览/);
-
-  const restored = boot('#debug?dbgMethodId=m1&dbgVersion=v2.3', app.storage);
-  assert.match(restored.html(), /value="v2.3" selected/);
-  boot('', new Map([['direction-classifier.mock.v1', '{invalid']]));
-  console.log('PASS: navigation, versions, draft guard, debug snapshots, legacy data cleanup, batch validation, live model revision selection and storage fallback');
+  assert.match(app.html(),/id="model-connection-page"/);
+  const disconnected=boot('#methods',new Map(),true);
+  await tick();
+  assert.match(disconnected.methodHtml(),/读取方法失败/);
+  assert.doesNotMatch(disconnected.methodHtml(),/多阶段学科交叉识别/);
+  console.log('PASS: database method references, legacy mock cleanup, routes, and existing execution demonstrations');
 }
-run().catch(error => { console.error(error); process.exitCode = 1; });
+
+run().catch(error=>{console.error(error);process.exitCode=1;});

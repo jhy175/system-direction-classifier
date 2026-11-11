@@ -1,16 +1,9 @@
 /* Local demonstration fixtures. No algorithm or model requests are made. */
 (() => {
 'use strict';
-const clone = value => JSON.parse(JSON.stringify(value));
-const defaultConfig=()=>({parse:{fields:'标题、关键词、摘要',layout:'结构化拼接',maxLen:3000,missing:'跳过缺失字段',clean:'去除重复空格'},router:{model:'',maxClusters:4,minClusters:1,prompt:'根据论文标题和摘要，识别可能涉及的学科簇。请保持输出为 JSON。',supplement:'不足时补充邻近簇'},recall:{mode:'llm',model:'',embeddingModel:'',maxCandidates:18,minCandidates:5,prompt:'依据学科画像和摘要召回候选学科。',index:'discipline-bge-v1',vectorWeight:0.65,fill:'按照簇内覆盖补足'},judge:{model:'',template:'学科任务与边界精判',prompt:'结合学科核心任务、边缘任务与边界说明，判定相关等级。\n输入：{{abstract}}\n候选：{{candidates}}',temperature:0.1,maxTokens:2048},post:{maxStrong:3,minLevel:1,outputLimit:8,order:'相关等级优先',failure:'保留原始结果'},element:{model:'',elements:'研究问题、研究理论、研究方法、研究发现',prompt:'逐句提取四类科研要素，返回原文位置与结构化结果。',sentences:'按标点分句',empty:'保留空要素'},mapping:{mode:'hybrid',model:'',index:'discipline-bge-v1',maxCandidates:10,vectorWeight:0.5,context:'当前句及相邻两句',prompt:'识别研究要素与学科的关联关系，解释证据。'},score:{threshold:1,denominator:'有效要素数量',mainPolicy:'以主学科精判结果为准',missing:'标记并排除缺失值'}});
-const seedData=()=>{
- const c=defaultConfig();
- const mk=(id,name,desc,scope,owner,tag,vers,other={})=>({id,name,desc,scope,owner,tag,kbId:'',kbVersion:'',defaultVersion:vers[0].number,versions:vers.map(v=>({date:'2026-11-08 14:27',author:owner,summary:'调整参数与学科判断规则',knowledgeVersion:'',config:clone(c),...v})),draft:null,...other});
- const m1=mk('m1','多阶段学科交叉识别','融合簇路由、学科召回、独立精判与研究要素的完整识别流程。','mine','我','中国一级学科',[{number:'v2.3',date:'2026-11-10 14:27',summary:'优化精判提示词与候选数量上限'},{number:'v2.2',date:'2026-11-04 09:20',summary:'调整研究要素学科识别策略'},{number:'v2.1',date:'2026-10-28 16:35',summary:'更新后处理规则'}]);
- m1.draft={config:clone(c),knowledgeVersion:'',baseVersion:'v2.3',summary:'候选召回参数优化（未发布）'};m1.draft.config.recall.maxCandidates=20;
- return {methods:[m1,mk('m2','语义要素识别','围绕研究问题、理论、方法与发现的语义要素识别。','team','研究组','中国一级学科',[{number:'v1.2',date:'2026-11-09 18:03',summary:'补充要素映射规则'}]),mk('m3','文本学科归属判定','通过摘要与关键词快速判断主要学科归属。','mine','我','交叉学科体系',[{number:'v1.0',date:'2026-11-03 10:12',summary:'首次发布'}]),mk('m4','学科簇快速路由','用于候选学科簇筛选的轻量流程模板。','builtin','系统','中国一级学科',[{number:'v0.9',date:'2026-10-25 16:40',summary:'内置模板初始化'}])],
- tasks:[{id:'t1',name:'论文摘要批量识别',methodId:'m1',version:'v2.3',kbVersion:'',file:'abstracts_120.csv',date:'2026-11-10 15:42',total:120,success:68,failed:2,pending:50,status:'处理中',rows:[]},{id:'t2',name:'国际会议论文识别',methodId:'m2',version:'v1.2',kbVersion:'',file:'conference_500.csv',date:'2026-11-09 18:30',total:500,success:500,failed:0,pending:0,status:'已完成',rows:[]},{id:'t3',name:'学科交叉案例集识别',methodId:'m1',version:'v2.2',kbVersion:'',file:'case_study_200.csv',date:'2026-11-06 10:05',total:200,success:177,failed:23,pending:0,status:'需检查',rows:[]}],histories:[]};
-};
+const seedData=()=>({
+ tasks:[{id:'t1',name:'论文摘要批量识别',version:'v2.3',kbVersion:'',file:'abstracts_120.csv',date:'2026-11-10 15:42',total:120,success:68,failed:2,pending:50,status:'处理中',rows:[]},{id:'t2',name:'国际会议论文识别',version:'v1.2',kbVersion:'',file:'conference_500.csv',date:'2026-11-09 18:30',total:500,success:500,failed:0,pending:0,status:'已完成',rows:[]},{id:'t3',name:'学科交叉案例集识别',version:'v2.2',kbVersion:'',file:'case_study_200.csv',date:'2026-11-06 10:05',total:200,success:177,failed:23,pending:0,status:'需检查',rows:[]}],histories:[]
+});
 
-window.ClassifierMockData = Object.freeze({defaultConfig, seedData});
+window.ClassifierMockData = Object.freeze({seedData});
 })();

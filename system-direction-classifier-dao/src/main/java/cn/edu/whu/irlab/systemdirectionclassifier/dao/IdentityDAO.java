@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** Parameterized JDBC for identity and knowledge aggregates. */
+/** Parameterized JDBC for classifier workspace data. */
 @Repository
 @RequiredArgsConstructor
 public class IdentityDAO {
@@ -24,7 +24,8 @@ public class IdentityDAO {
         "demo_knowledge_summary","demo_knowledge_cluster","demo_knowledge_cluster_member",
         "demo_knowledge_seed_paper","demo_seed_paper_discipline","demo_knowledge_asset",
         "demo_file_asset","demo_asset_reference","demo_knowledge_import","demo_knowledge_import_item",
-        "demo_model_connection","demo_model_connection_revision","demo_model_credential","demo_model_connection_test"));
+        "demo_model_connection","demo_model_connection_revision","demo_model_credential","demo_model_connection_test",
+        "demo_method","demo_method_version","demo_method_stage","demo_method_stage_model"));
     private String table(String name) {
         if (!TABLES.contains(name)) throw new IllegalArgumentException("Unknown business table");
         return name;
