@@ -27,7 +27,8 @@ public class IdentityDAO {
         "demo_model_connection","demo_model_connection_revision","demo_model_credential","demo_model_connection_test",
         "demo_method","demo_method_version","demo_method_stage","demo_method_stage_model",
         "demo_input_snapshot","demo_recognition_run","demo_run_stage","demo_run_candidate","demo_model_call",
-        "demo_candidate_judgment","demo_run_result","demo_result_discipline","demo_run_intervention","demo_debug_record"));
+        "demo_candidate_judgment","demo_run_result","demo_result_discipline","demo_run_intervention","demo_debug_record",
+        "demo_batch_task","demo_batch_import","demo_batch_row","demo_batch_item"));
     private String table(String name) {
         if (!TABLES.contains(name)) throw new IllegalArgumentException("Unknown business table");
         return name;

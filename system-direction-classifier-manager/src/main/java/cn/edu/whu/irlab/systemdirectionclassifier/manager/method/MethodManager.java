@@ -122,7 +122,15 @@ public class MethodManager {
     }
 
     public Map<String,Object> executionVersion(long methodId, long versionId) {
-        Access access = access("debug:run");
+        return executionVersion(methodId, versionId, "debug:run");
+    }
+
+    public Map<String,Object> batchExecutionVersion(long methodId, long versionId) {
+        return executionVersion(methodId, versionId, "batch:create");
+    }
+
+    private Map<String,Object> executionVersion(long methodId, long versionId, String permission) {
+        Access access = access(permission);
         Map<String,Object> method = base(methodId, access, false);
         if (method.get("archivedAt") != null || !access.uses(method)) throw denied();
         Map<String,Object> version = saved(method, versionId, access);

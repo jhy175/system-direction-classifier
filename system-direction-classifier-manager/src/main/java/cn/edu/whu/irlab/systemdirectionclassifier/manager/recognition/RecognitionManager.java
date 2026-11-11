@@ -56,16 +56,19 @@ public class RecognitionManager {
         if (Arrays.asList("title", "abstract", "keywords", "text").stream().allMatch(key -> paper.path(key).asText().trim().isEmpty())) {
             throw invalid("请输入论文标题、关键词或摘要");
         }
+        Long sourceRun = request.path("sourceBatchRunId").isMissingNode() ? null : requiredId(request, "sourceBatchRunId");
+        Long sourceRow = null;
+        if (sourceRun != null) {
+            access("batch:read");
+            Map<String,Object> source = store.ownedBatchRun(sourceRun, actor);
+            sourceRow = id(store.db.one("SELECT source_batch_row_id FROM demo_input_snapshot WHERE id=?",
+                id(source, "inputSnapshotId")), "sourceBatchRowId");
+        }
+        final Long row = sourceRow;
         long runId = store.tx.execute(tx -> {
-            String encoded = paper.toString();
-            String year = paper.path("year").asText();
-            long snapshot = store.db.insert("demo_input_snapshot", fields("created_by", actor, "content_type", paper.get("type").asText(),
-                "title", paper.get("title").asText(), "keywords", paper.get("keywords").asText(),
-                "abstract_text", paper.get("abstract").asText(), "journal_name", paper.get("journal").asText(),
-                "doi", paper.get("doi").asText(), "publication_raw", year,
-                "publication_year", year.matches("[0-9]{4}") ? Integer.valueOf(year) : null,
-                "external_record_id", paper.get("externalId").asText(), "raw_input_json", encoded, "content_sha256", hash(encoded)));
-            return create(version, actor, snapshot, null, "single", "parse", null, Collections.emptyMap());
+            long snapshot = store.snapshot(paper, actor, row);
+            return create(version, actor, snapshot, sourceRun, sourceRun == null ? "single" : "copy_input",
+                "parse", null, Collections.emptyMap());
         });
         return submit(runId, actor);
     }
@@ -208,12 +211,7 @@ public class RecognitionManager {
             "trigger_type", trigger, "start_stage_code", start, "implementation_build", RecognitionAlgorithm.BUILD,
             "resource_manifest_sha256", version.get("manifestHash"),
             "execution_overrides_json", overrides == null || overrides.isEmpty() ? null : overrides.toString()));
-        for (Map<String,Object> definition : RecognitionExecutor.definitions(version)) {
-            String code = (String)definition.get("stageCode");
-            Long source = reused.get(code);
-            store.db.insert(STAGE, fields("run_id", run, "stage_code", code, "source_stage_id", source,
-                "status", source == null ? "pending" : "reused", "payload_schema_version", definition.get("outputSchemaVersion")));
-        }
+        store.initializeStages(run, RecognitionExecutor.definitions(version), reused);
         return run;
     }
 

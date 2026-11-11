@@ -44,18 +44,25 @@ final class RecognitionExecutor {
     void close() { judges.shutdownNow(); }
 
     void execute(long runId, long actor) {
+        execute(runId, actor, null);
+    }
+
+    void execute(long runId, long actor, Lease lease) {
         CurrentActor.set(actor);
         Map<String,Object> stage = null;
         try {
+            if (lease != null) lease.check();
             if (store.db.execute("UPDATE demo_recognition_run SET status='running',started_at=? WHERE id=? AND status='pending'",
                 now(), runId) != 1) return;
-            Map<String,Object> run = store.ownedRun(runId, actor);
-            Map<String,Object> version = methods.executionVersion(id(run, "methodId"), id(run, "methodVersionId"));
+            Map<String,Object> run = lease == null ? store.ownedRun(runId, actor) : store.ownedBatchRun(runId, actor);
+            Map<String,Object> version = lease == null ? methods.executionVersion(id(run, "methodId"), id(run, "methodVersionId"))
+                : methods.batchExecutionVersion(id(run, "methodId"), id(run, "methodVersionId"));
             if (!Objects.equals(run.get("resourceManifestSha256"), version.get("manifestHash"))) {
                 throw new StageFailure("resource_changed", "运行引用的知识资源版本已变化");
             }
-            Work work = new Work(run, version, actor);
+            Work work = new Work(run, version, actor, lease);
             for (String code : RecognitionAlgorithm.STAGES) {
+                if (lease != null) lease.check();
                 stage = store.stage(runId, code);
                 Map<String,Object> config = work.configs.get(code);
                 if ("reused".equals(stage.get("status"))) {
@@ -68,11 +75,14 @@ final class RecognitionExecutor {
                 store.db.update(STAGE, stageId, fields("status", "running", "started_at", now()));
                 long started = System.nanoTime();
                 ObjectNode output = runStage(work, code, stageId, config);
+                if (lease != null) lease.check();
                 long duration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started);
                 if ("result".equals(code)) publish(work, output, stageId, duration);
                 else finishStage(stageId, output, duration);
                 work.outputs.put(code, output);
             }
+        } catch (LeaseLost e) {
+            LOG.info("Batch run {} no longer holds its claim", runId);
         } catch (RuntimeException e) {
             StageFailure failure;
             if (e instanceof StageFailure) failure = (StageFailure)e;
@@ -82,7 +92,8 @@ final class RecognitionExecutor {
                     e.getClass().getSimpleName());
                 failure = new StageFailure("execution_error", "执行或保存阶段结果时发生错误");
             }
-            fail(runId, stage, failure);
+            try { fail(runId, stage, failure, lease); }
+            catch (LeaseLost ignored) { /* Recovery already owns this item. */ }
         } finally {
             CurrentActor.clear();
         }
@@ -100,7 +111,7 @@ final class RecognitionExecutor {
                 ObjectNode request = store.json.createObjectNode().put("paper_text", text);
                 request.set("clusters", brief);
                 input(stageId, request);
-                JsonNode response = call(work.runId, stageId, null, 1, definition, variables(
+                JsonNode response = call(work, stageId, null, 1, definition, variables(
                     "paper_text", text, "clusters_json", brief.toString(), "max_clusters", config.path("max_clusters").asText())).response;
                 return algorithm.route(response, work.clusters, config);
             }
@@ -118,7 +129,7 @@ final class RecognitionExecutor {
                 request.set("selected_clusters", selected);
                 request.set("candidate_pool", brief);
                 input(stageId, request);
-                JsonNode response = call(work.runId, stageId, null, 1, definition, variables(
+                JsonNode response = call(work, stageId, null, 1, definition, variables(
                     "paper_text", text, "selected_clusters_json", routing.toString(),
                     "candidate_pool_json", brief.toString(), "max_candidates", config.path("max_candidates").asText())).response;
                 return algorithm.recall(response, brief, pool, work.disciplines, config);
@@ -172,7 +183,16 @@ final class RecognitionExecutor {
                 finally { CurrentActor.clear(); }
             }, judges));
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0])).join();
+        try {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0])).get();
+        } catch (InterruptedException e) {
+            futures.forEach(future -> future.cancel(true));
+            Thread.currentThread().interrupt();
+            throw new StageFailure("interrupted", "执行被中断");
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof RuntimeException) throw (RuntimeException)e.getCause();
+            throw new IllegalStateException(e.getCause());
+        }
         ObjectNode output = store.json.createObjectNode();
         ArrayNode judgments = output.putArray("judgments");
         int failed = 0;
@@ -210,7 +230,7 @@ final class RecognitionExecutor {
         for (int attempt = 1; attempt <= limit; attempt++) {
             attempts = attempt;
             try {
-                Answer answer = call(work.runId, stageId, candidateId, attempt, definition, variables);
+                Answer answer = call(work, stageId, candidateId, attempt, definition, variables);
                 outcome = answer.callId;
                 ObjectNode judged = (ObjectNode)algorithm.judgment(answer.response, candidate, portrait, scores);
                 judged.put("llm_attempts", attempt);
@@ -235,7 +255,7 @@ final class RecognitionExecutor {
         return judged;
     }
 
-    private Answer call(long runId, long stageId, Long candidateId, int logicalNo, Map<String,Object> definition,
+    private Answer call(Work work, long stageId, Long candidateId, int logicalNo, Map<String,Object> definition,
                         Map<String,String> variables) {
         JsonNode prompts = store.node(definition.get("prompts"));
         JsonNode options = store.node(definition.get("callOptions"));
@@ -244,13 +264,15 @@ final class RecognitionExecutor {
         int limit = options.path("llm_attempt_limit").asInt(1);
         StageFailure failure = new StageFailure("missing_response", "未执行模型调用");
         for (int attempt = 1; attempt <= limit; attempt++) {
+            if (work.lease != null) work.lease.check();
             RecognitionChat call = models.prepareRecognitionChat(revision, requestSequence.getAndIncrement(),
                 prompts.path("system").asText(), rendered, options);
-            long callId = store.db.insert(CALL, fields("run_id", runId, "stage_id", stageId, "candidate_id", candidateId,
+            long callId = store.db.insert(CALL, fields("run_id", work.runId, "stage_id", stageId, "candidate_id", candidateId,
                 "logical_call_no", logicalNo, "attempt_no", attempt, "model_connection_revision_id", revision,
                 "endpoint_snapshot", call.endpoint, "request_json", call.requestEvidence()));
             long started = System.nanoTime();
             ChatReply reply = call.execute();
+            if (work.lease != null) work.lease.check();
             JsonNode parsed = null;
             if (reply.errorCode == null) {
                 parsed = parseReply(reply.content);
@@ -334,6 +356,7 @@ final class RecognitionExecutor {
 
     private void publish(Work work, ObjectNode output, long stageId, long duration) {
         store.tx.execute(status -> {
+            if (work.lease != null) work.lease.lock();
             JsonNode main = output.path("main_discipline");
             long result = store.db.insert("demo_run_result", fields("run_id", work.runId, "knowledge_version_id", work.knowledgeId,
                 "revision_no", 1, "main_knowledge_discipline_id", main.isNull() ? null : main.path("discipline_id").longValue(),
@@ -347,12 +370,18 @@ final class RecognitionExecutor {
             }
             finishStage(stageId, output, duration);
             store.db.update(RUN, work.runId, fields("status", "succeeded", "current_result_id", result, "finished_at", now()));
+            if (work.lease != null) work.lease.finish(result);
             return null;
         });
     }
 
     void fail(long runId, Map<String,Object> stage, StageFailure failure) {
+        fail(runId, stage, failure, null);
+    }
+
+    private void fail(long runId, Map<String,Object> stage, StageFailure failure, Lease lease) {
         store.tx.execute(tx -> {
+            if (lease != null) lease.lock();
             String code = stage == null ? null : (String)stage.get("stageCode");
             if (stage != null) {
                 store.db.execute("UPDATE demo_run_stage SET status='failed',error_code=?,error_message=?,finished_at=?," +
@@ -362,6 +391,7 @@ final class RecognitionExecutor {
             store.db.execute("UPDATE demo_run_stage SET status='skipped' WHERE run_id=? AND status='pending'", runId);
             store.db.execute("UPDATE demo_recognition_run SET status='failed',failed_stage_code=?,error_code=?,error_message=?," +
                 "finished_at=? WHERE id=? AND status IN ('pending','running')", code, failure.code, failure.getMessage(), now(), runId);
+            if (lease != null) lease.finish(null);
             return null;
         });
     }
@@ -374,6 +404,7 @@ final class RecognitionExecutor {
     private final class Work {
         final long runId, actor, knowledgeId;
         final JsonNode input, overrides;
+        final Lease lease;
         final int topK;
         final Map<String,Map<String,Object>> configs = new LinkedHashMap<>();
         final Map<String,JsonNode> outputs = new HashMap<>();
@@ -382,8 +413,9 @@ final class RecognitionExecutor {
         final Map<String,ObjectNode> clusters = new LinkedHashMap<>();
         final Map<Long,Long> candidateIds = new HashMap<>();
 
-        Work(Map<String,Object> run, Map<String,Object> version, long actor) {
+        Work(Map<String,Object> run, Map<String,Object> version, long actor, Lease lease) {
             this.actor = actor;
+            this.lease = lease;
             runId = id(run, "id");
             knowledgeId = id(run, "knowledgeVersionId");
             input = store.node(run.get("rawInputJson"));
@@ -442,6 +474,14 @@ final class RecognitionExecutor {
         StageFailure(String code, String message) { this(code, message, null); }
         StageFailure(String code, String message, Long callId) { super(message); this.code = code; this.callId = callId; }
     }
+
+    interface Lease {
+        void check();
+        void lock();
+        void finish(Long result);
+    }
+
+    static final class LeaseLost extends RuntimeException { }
 
     private static final class Answer {
         final long callId;

@@ -39,7 +39,7 @@ window.ClassifierDebug = Object.freeze({
     const {render, notify, openModal, closeModal, renderModal, openMethod, download} = actions;
     const {esc, btn, badge, field, opt, note, ic, empty, pageHead} = view;
     let run = null, detail = null, stage = 'parse', showCalls = false, busy = false;
-    let routeKey = '', runError = '', detailError = '', detailPending = false;
+    let routeKey = '', runError = '', detailError = '', detailPending = false, sourceBatchRunId = null;
     let poll = 0, routeStamp = 0, detailStamp = 0;
     let history = null, historyError = '', historySearch = '', choices = [], historyStamp = 0;
 
@@ -93,7 +93,7 @@ window.ClassifierDebug = Object.freeze({
       pollRun();
     }
 
-    function reset(input = emptyInput()) {
+    function reset(input = emptyInput(), source = null) {
       clearTimeout(poll);
       routeStamp++;
       detailStamp++;
@@ -104,6 +104,7 @@ window.ClassifierDebug = Object.freeze({
       ui.dbgRunId = '';
       ui.dbgHistoryId = '';
       ui.dbgInput = {...emptyInput(), ...input};
+      sourceBatchRunId = source;
       redraw();
     }
 
@@ -239,28 +240,28 @@ window.ClassifierDebug = Object.freeze({
         <tbody>${rows.map(row => `<tr>${row.map(x => `<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
     }
 
-    function stageOutput(output) {
+    function stageOutput(output, phase = stage) {
       if (!output) return '<p class="hint">当前阶段暂无输出。</p>';
       const name = row => `${row.discipline_name} (${row.discipline_code})`;
-      if (stage === 'parse') return table(['字段','实际内容','来源'], Object.entries(output.parsed_fields || {}).map(([key, value]) =>
+      if (phase === 'parse') return table(['字段','实际内容','来源'], Object.entries(output.parsed_fields || {}).map(([key, value]) =>
         [key, value, output.field_sources?.[key]])) + rawDetails('实际召回文本', output.recall_text);
-      if (stage === 'router') return table(['次序','学科簇','路由等级','理由','成员代码'], (output.selected_clusters || [])
+      if (phase === 'router') return table(['次序','学科簇','路由等级','理由','成员代码'], (output.selected_clusters || [])
         .map(row => [row.route_rank, row.cluster_name, row.route_level, row.route_reason, row.member_codes.join('、')]));
-      if (stage === 'recall') return table(['名次','候选学科','来源','召回等级','分数','理由'], (output.selected_candidates || [])
+      if (phase === 'recall') return table(['名次','候选学科','来源','召回等级','分数','理由'], (output.selected_candidates || [])
         .map(row => [row.recall_rank, name(row), ({model:'模型',cluster_fill:'簇内补足',global_fallback:'全库兜底'}[row.candidate_source]),
           row.recall_level, row.effective_score, row.recall_reason]));
-      if (stage === 'judge') return table(['候选学科','精判等级','理由','置信度','边界解释'], (output.judgments || [])
+      if (phase === 'judge') return table(['候选学科','精判等级','理由','置信度','边界解释'], (output.judgments || [])
         .map(row => [name(row), row.judgment_failed ? '精判失败' : row.raw_level, row.reason || row.error_message, row.confidence, row.boundary_explanation]));
-      const rows = stage === 'post' ? output.complete_ranking : output.disciplines;
+      const rows = phase === 'post' ? output.complete_ranking : output.disciplines;
       return table(['学科','原始等级','最终等级','处理前名次','处理后名次','决定'], (rows || [])
         .map(row => [name(row), row.raw_level, row.final_level, row.rank_before, row.rank_after,
           [row.adjustment_reason, row.included ? '保留' : row.filter_reason].filter(Boolean).join(' · ')]));
     }
 
-    function callRows() {
-      if (!showCalls) return '';
-      if (!detail?.calls?.length) return '<p class="hint">当前阶段暂无模型调用记录。</p>';
-      return detail.calls.map(call => `<details class="debug-call"><summary>${esc(call.disciplineName || stageLabel(stage))}
+    function callRows(trace = detail, phase = stage, enabled = showCalls) {
+      if (!enabled) return '';
+      if (!trace?.calls?.length) return '<p class="hint">当前阶段暂无模型调用记录。</p>';
+      return trace.calls.map(call => `<details class="debug-call"><summary>${esc(call.disciplineName || stageLabel(phase))}
         · ${esc(call.modelId)} · 调用 ${call.logicalCallNo} / 尝试 ${call.attemptNo} · ${esc(labels[call.status])}
         ${call.durationMs == null ? '' : ' · ' + esc(call.durationMs) + ' ms'}</summary>
         ${call.errorMessage ? note(esc(call.errorMessage), 'red') : ''}
@@ -269,6 +270,11 @@ window.ClassifierDebug = Object.freeze({
         ${rawDetails('原始响应', call.rawResponse)}
         ${rawDetails('解析结果', call.parsedResponse)}
         ${rawDetails('用量', call.usage)}</details>`).join('');
+    }
+
+    function renderEvidence(phase, trace, calls) {
+      return stageOutput(trace?.output, phase) + rawDetails('完整阶段输入', trace?.input) +
+        rawDetails('完整阶段输出', trace?.output) + callRows(trace, phase, calls);
     }
 
     function process() {
@@ -289,9 +295,7 @@ window.ClassifierDebug = Object.freeze({
           <div class="detail-block">${info?.errorMessage ? note(esc(info.errorMessage), 'red') : ''}
             ${detail?.sourceRunId ? note(`复用运行 #${esc(detail.sourceRunId)} 的阶段结果`) : ''}
             ${detailError ? note(esc(detailError), 'red') : ''}
-            ${detailPending && !detail ? '<p class="hint">正在读取阶段详情…</p>' : stageOutput(detail?.output)}
-            ${rawDetails('完整阶段输入', detail?.input)}${rawDetails('完整阶段输出', detail?.output)}
-            ${callRows()}</div></section>`;
+            ${detailPending && !detail ? '<p class="hint">正在读取阶段详情…</p>' : renderEvidence(stage, detail, showCalls)}</div></section>`;
     }
 
     function page(methods, methodsError) {
@@ -331,7 +335,9 @@ window.ClassifierDebug = Object.freeze({
           const method = methods.find(item => item.id === ui.dbgMethodId);
           const version = method?.versions.find(item => item.number === ui.dbgVersion);
           if (!version) throw new Error('请选择已保存的方法版本');
-          const next = await request('/runs', 'POST', {methodId: Number(method.id), methodVersionId: version.id, input: ui.dbgInput});
+          const next = await request('/runs', 'POST', {methodId: Number(method.id), methodVersionId: version.id, input: ui.dbgInput,
+            ...(sourceBatchRunId ? {sourceBatchRunId} : {})});
+          sourceBatchRunId = null;
           ++routeStamp;
           show(next);
         });
@@ -375,7 +381,7 @@ window.ClassifierDebug = Object.freeze({
         });
       }
     }
-    return {page, handle, route, reset, historyView, candidateView, editable: () => !isLocked()};
+    return {page, handle, route, reset, historyView, candidateView, renderEvidence, editable: () => !isLocked()};
   }
 });
 })();

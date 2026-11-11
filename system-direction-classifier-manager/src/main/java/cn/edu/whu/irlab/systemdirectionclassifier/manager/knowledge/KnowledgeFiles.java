@@ -24,15 +24,23 @@ public class KnowledgeFiles {
 
     Upload decode(JsonNode input, int limit) {
         String name = text(input, "fileName", 255, true);
-        if (name.equals(".") || name.equals("..") || name.indexOf('"') >= 0 ||
-            name.matches(".*[\\\\/:*?<>|\\p{Cntrl}].*"))
-            throw invalid("无效文件名");
+        checkName(name);
         String encoded = text(input, "content", (limit + 2) / 3 * 4, true);
         byte[] bytes;
         try { bytes = Base64.getDecoder().decode(encoded); }
         catch (IllegalArgumentException error) { throw invalid("文件内容格式错误"); }
         if (bytes.length == 0 || bytes.length > limit) throw invalid("文件为空或超过大小限制");
         return new Upload(name, bytes);
+    }
+
+    public long storeImport(String name, byte[] bytes, long actor) {
+        checkName(name);
+        return store(new Upload(name, bytes), actor);
+    }
+
+    private static void checkName(String name) {
+        if (name == null || name.trim().isEmpty() || name.length() > 255 || name.equals(".") || name.equals("..") ||
+            name.indexOf('"') >= 0 || name.matches(".*[\\\\/:*?<>|\\p{Cntrl}].*")) throw invalid("无效文件名");
     }
 
     long store(Upload upload, long actor) {
@@ -61,7 +69,7 @@ public class KnowledgeFiles {
         return id(row, "id");
     }
 
-    void reference(long asset, String type, long object, String role) {
+    public void reference(long asset, String type, long object, String role) {
         db.execute("INSERT INTO demo_asset_reference(asset_id,object_type,object_id,role) VALUES (?,?,?,?) " +
             "ON DUPLICATE KEY UPDATE id=id", asset, type, object, role);
     }

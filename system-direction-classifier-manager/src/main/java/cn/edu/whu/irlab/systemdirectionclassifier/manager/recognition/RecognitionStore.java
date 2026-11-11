@@ -48,6 +48,33 @@ final class RecognitionStore {
         return run;
     }
 
+    Map<String,Object> ownedBatchRun(long runId, long actor) {
+        Map<String,Object> run = db.one(RUN_QUERY + "JOIN demo_batch_item b ON b.id=r.batch_item_id " +
+            "WHERE r.id=? AND r.created_by=?", runId, actor);
+        if (run == null) throw missing();
+        return run;
+    }
+
+    long snapshot(JsonNode paper, long actor, Long sourceRow) {
+        String encoded = paper.toString();
+        String year = paper.path("year").asText();
+        return db.insert("demo_input_snapshot", fields("created_by", actor, "source_batch_row_id", sourceRow,
+            "content_type", paper.path("type").asText("学术论文"), "title", paper.path("title").asText(),
+            "keywords", paper.path("keywords").asText(), "abstract_text", paper.path("abstract").asText(),
+            "journal_name", paper.path("journal").asText(), "doi", paper.path("doi").asText(), "publication_raw", year,
+            "publication_year", year.matches("[0-9]{4}") ? Integer.valueOf(year) : null,
+            "external_record_id", paper.path("externalId").asText(), "raw_input_json", encoded, "content_sha256", hash(encoded)));
+    }
+
+    void initializeStages(long run, List<Map<String,Object>> definitions, Map<String,Long> reused) {
+        for (Map<String,Object> definition : definitions) {
+            String code = (String)definition.get("stageCode");
+            Long source = reused.get(code);
+            db.insert(STAGE, fields("run_id", run, "stage_code", code, "source_stage_id", source,
+                "status", source == null ? "pending" : "reused", "payload_schema_version", definition.get("outputSchemaVersion")));
+        }
+    }
+
     Map<String,Object> stage(long runId, String code) {
         Map<String,Object> row = db.one("SELECT * FROM demo_run_stage WHERE run_id=? AND stage_code=?", runId, code);
         if (row == null) throw missing();
