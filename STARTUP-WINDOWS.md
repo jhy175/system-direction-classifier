@@ -1,6 +1,6 @@
 # Windows 本地启动
 
-用户、权限和团队模块已接入持久化 MySQL；识别算法相关工作台仍保留演示数据。完整功能、接口与维护说明见 [用户模块交付说明](docs/zh-CN/user-module-completion.md)，验收结果见 [测试报告](docs/zh-CN/user-module-test-report.md)。
+用户、权限、团队、知识库、模型连接、识别方法和单篇调试已接入 MySQL。单篇调试使用已保存方法绑定的模型修订执行识别，并保存阶段、调用和结果。批量任务目前使用演示数据。用户模块的完整功能和维护说明见 [用户模块交付说明](docs/zh-CN/user-module-completion.md)，验收结果见 [测试报告](docs/zh-CN/user-module-test-report.md)。
 
 在项目根目录打开 PowerShell：
 
@@ -36,3 +36,7 @@ python .\scripts\test-users.py
 ```
 
 停止测试环境使用 `scripts/stop-users.ps1 -Port 8083`。停止两套环境后再重新打包。数据库与应用的本地配置和日志位置均见交付说明。
+
+单篇调试的可重复验收在 8083 测试实例执行。在启动测试实例的 PowerShell 中设置 `$env:CLASSIFIER_MODEL_PRIVATE_BASE_URLS = 'http://127.0.0.1:18763/v1'`，随后运行 `python .\scripts\test-recognition.py`。测试使用本地模型测试服务，覆盖调用失败、重试、候选干预和历史回看。
+
+使用已绑定的实际模型验证时，运行 `python .\scripts\test-recognition.py --live --base http://127.0.0.1:8082`。这会执行一条示例论文识别并保存验收历史。

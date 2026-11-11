@@ -5,7 +5,7 @@
     overview: [], methods: [], knowledge: [], batch: [], settings: [],
     methodDetail: ['methodId', 'methodVersion', 'methodView', 'methodTab', 'methodStage'],
     kbDetail: ['kbId', 'kbVersion', 'kbVersionMode', 'kbTab', 'kbSelected'],
-    debug: ['dbgMethodId', 'dbgVersion'],
+    debug: ['dbgMethodId', 'dbgVersion', 'dbgRunId', 'dbgHistoryId'],
     batchWizard: [], taskDetail: ['batchTaskId']
   });
   const has = page => Object.prototype.hasOwnProperty.call(routes, page);

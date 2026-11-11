@@ -18,6 +18,12 @@ button:focus-visible,a:focus-visible{outline:2px solid #79a78a;outline-offset:2p
 .debug-area.debug-unrun{grid-template-columns:minmax(0,1fr)}
 .debug-area.debug-unrun .result-overview{display:none}
 .debug-area.debug-unrun .debug-form{width:100%;max-width:920px}
+.debug-stage-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.debug-table{overflow-x:auto}
+.debug-table td{white-space:pre-wrap;overflow-wrap:anywhere}
+.debug-call{margin-top:8px;padding:8px 12px;border:1px solid var(--line,#e1e8ed);border-radius:8px}
+.debug-call summary,.detail-block summary{cursor:pointer;font-weight:600}
+.debug-code{max-height:24rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
 .kb-filter { display:flex; flex-wrap:wrap; gap:10px; }
 .kb-filter > input { width:min(240px,100%); }
 .kb-dialog { width:min(720px,calc(100vw - 32px)); max-height:90vh; padding:0; border:1px solid #dce6de; border-radius:12px; color:inherit; }

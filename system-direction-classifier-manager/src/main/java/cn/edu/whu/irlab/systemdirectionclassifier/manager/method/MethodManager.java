@@ -121,6 +121,21 @@ public class MethodManager {
         return row;
     }
 
+    public Map<String,Object> executionVersion(long methodId, long versionId) {
+        Access access = access("debug:run");
+        Map<String,Object> method = base(methodId, access, false);
+        if (method.get("archivedAt") != null || !access.uses(method)) throw denied();
+        Map<String,Object> version = saved(method, versionId, access);
+        if (!IMPLEMENTATION.equals(version.get("implementationKey")) || !SCHEMA.equals(version.get("configSchemaVersion"))) {
+            throw conflict("该方法版本的算法实现暂不可执行");
+        }
+        Map<String,Object> resources = knowledge.methodResources(id(version, "taxonomyId"), id(version, "knowledgeVersionId"));
+        version.put("methodName", method.get("name"));
+        version.put("manifestHash", resources.get("manifestHash"));
+        version.put("stages", stages(versionId).values().stream().map(Stage::view).collect(Collectors.toList()));
+        return version;
+    }
+
     @Transactional
     public Map<String,Object> create(JsonNode input) {
         Access access = access("method:create");

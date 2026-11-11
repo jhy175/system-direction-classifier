@@ -62,16 +62,7 @@ class ModelConnectionProbe {
             }
             boolean embedding = "embedding".equals(config.type);
             HttpUrl url = HttpUrl.get(address + (embedding ? "/embeddings" : "/chat/completions"));
-            boolean explicitlyAllowed = privateEndpoints.contains(address);
-            OkHttpClient client = http.newBuilder()
-                .connectionPool(new ConnectionPool(0, 1, TimeUnit.SECONDS))
-                .dns(host -> {
-                    List<InetAddress> addresses = Dns.SYSTEM.lookup(host);
-                    if (!explicitlyAllowed && addresses.stream().anyMatch(ip -> !publicAddress(ip))) {
-                        throw new BlockedAddress();
-                    }
-                    return addresses;
-                }).build();
+            OkHttpClient client = client(address, 25);
             Request.Builder request = new Request.Builder().url(url).header("Accept", "application/json")
                 .post(RequestBody.create(JSON, json.writeValueAsBytes(payload(config, embedding))));
             if (key != null) request.header("Authorization", "Bearer " + key);
@@ -103,6 +94,65 @@ class ModelConnectionProbe {
             result.durationMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started);
             running.release();
         }
+    }
+
+    private OkHttpClient client(String address, int timeoutSeconds) {
+        boolean explicitlyAllowed = privateEndpoints.contains(address);
+        return http.newBuilder()
+            .callTimeout(timeoutSeconds, TimeUnit.SECONDS).readTimeout(timeoutSeconds, TimeUnit.SECONDS)
+            .connectionPool(new ConnectionPool(0, 1, TimeUnit.SECONDS))
+            .dns(host -> {
+                List<InetAddress> addresses = Dns.SYSTEM.lookup(host);
+                if (!explicitlyAllowed && addresses.stream().anyMatch(ip -> !publicAddress(ip))) throw new BlockedAddress();
+                return addresses;
+            }).build();
+    }
+
+    ModelConnectionManager.ChatReply complete(String address, String key, ObjectNode body, int timeoutSeconds) {
+        validateAddress(address);
+        Request.Builder request = new Request.Builder().url(address + "/chat/completions")
+            .header("Accept", "application/json").post(RequestBody.create(JSON, body.toString()));
+        if (key != null) request.header("Authorization", "Bearer " + key);
+        ModelConnectionManager.ChatReply result = new ModelConnectionManager.ChatReply();
+        try (Response response = client(address, timeoutSeconds).newCall(request.build()).execute()) {
+            result.requestId = safeId(response.header("x-request-id"), key, 160);
+            int maxBytes = 4 * 1024 * 1024;
+            ResponseBody captured = response.peekBody(maxBytes + 1L);
+            if (captured.contentLength() > maxBytes) return result.fail("response_too_large", "模型响应超出采集上限");
+            result.raw = redact(captured.string(), key);
+            if (!response.isSuccessful()) {
+                Result error = new Result();
+                error.httpStatus = response.code();
+                httpError(error);
+                return result.fail(error.errorCode, error.errorMessage + "（HTTP " + response.code() + "）");
+            }
+            try {
+                JsonNode envelope = json.readTree(result.raw);
+                if (envelope == null || !envelope.isObject()) return result.fail("invalid_response", "模型响应格式无效");
+                JsonNode content = envelope.path("choices").path(0).path("message").path("content");
+                result.usage = envelope.path("usage").isObject() ? envelope.path("usage").toString() : null;
+                if (result.requestId == null) result.requestId = safeId(envelope.path("id").asText(null), key, 160);
+                if (!content.isTextual() || content.asText().trim().isEmpty()) {
+                    return result.fail("invalid_response", "模型未返回文本内容");
+                }
+                result.content = content.asText();
+                return result;
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                return result.fail("invalid_response", "模型响应不是有效的 JSON");
+            }
+        } catch (BlockedAddress e) {
+            return result.fail("address_blocked", "模型地址解析到受限网络");
+        } catch (java.io.InterruptedIOException e) {
+            return result.fail("timeout", "模型调用超时");
+        } catch (IOException e) {
+            return result.fail("connection_error", "模型服务连接或读取失败");
+        }
+    }
+
+    String redact(String text, String key) {
+        if (key == null || key.isEmpty()) return text;
+        String encoded = json.valueToTree(key).toString();
+        return text.replace(key, "[已脱敏]").replace(encoded.substring(1, encoded.length() - 1), "[已脱敏]");
     }
 
     private ObjectNode payload(ModelConnectionConfig config, boolean embedding) {

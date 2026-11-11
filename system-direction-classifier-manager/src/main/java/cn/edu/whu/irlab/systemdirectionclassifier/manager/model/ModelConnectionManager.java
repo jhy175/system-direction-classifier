@@ -302,6 +302,86 @@ public class ModelConnectionManager {
         return new Access(actor, permissions.contains("connection:manage"), teams, readable, usable);
     }
 
+    public void checkRecognitionModel(long revisionId) {
+        recognitionModel(revisionId);
+    }
+
+    private Map<String,Object> recognitionModel(long revisionId) {
+        Access access = access();
+        Map<String,Object> row = db.one("SELECT c.id,c.owner_user_id,c.visibility,c.team_id," + REVISION_COLUMNS +
+            ",r.credential_scope_key,k.credential_version,k.encryption_key_id,k.encrypted_secret,DATABASE() AS schema_name " +
+            "FROM demo_model_connection_revision r JOIN demo_model_connection c ON c.id=r.connection_id " +
+            "LEFT JOIN demo_model_credential k ON k.connection_id=c.id AND k.credential_scope_key=r.credential_scope_key " +
+            "AND k.active_slot=1 AND r.auth_type<>'none' WHERE r.id=? AND c.status='enabled' " +
+            "AND r.model_type='chat' AND r.protocol_code='openai_compatible'", revisionId);
+        if (row == null || !access.uses(row)) throw new IdentityException(409, "方法绑定的对话模型已停用或不可用");
+        if (!"none".equals(row.get("authType")) && row.get("encryptedSecret") == null) {
+            throw new IdentityException(409, "方法绑定的模型缺少有效凭据");
+        }
+        return row;
+    }
+
+    public RecognitionChat prepareRecognitionChat(long revisionId, long sequence, String system, String user, JsonNode options) {
+        Map<String,Object> row = recognitionModel(revisionId);
+        ModelConnectionConfig config = ModelConnectionConfig.stored(row, json);
+        int weight = 1;
+        if (config.routing != null) {
+            for (JsonNode entry : config.routing.path("additional_endpoints")) weight += entry.path("weight").asInt();
+        }
+        long slot = Math.floorMod(sequence, (long)weight);
+        String address = config.baseUrl;
+        if (slot > 0) {
+            for (JsonNode entry : config.routing.path("additional_endpoints")) {
+                slot -= entry.path("weight").asInt();
+                if (slot <= 0) {
+                    address = entry.path("base_url").asText();
+                    break;
+                }
+            }
+        }
+        probe.validateAddress(address);
+        String key = row.get("encryptedSecret") == null ? null :
+            cipher.decrypt((String)row.get("schemaName"), id(row, "id"), (byte[])row.get("credentialScopeKey"),
+                id(row, "credentialVersion"), (String)row.get("encryptionKeyId"), (byte[])row.get("encryptedSecret"));
+        com.fasterxml.jackson.databind.node.ObjectNode body = json.createObjectNode().put("model", config.model);
+        com.fasterxml.jackson.databind.node.ArrayNode messages = body.putArray("messages");
+        messages.addObject().put("role", "system").put("content", system);
+        messages.addObject().put("role", "user").put("content", user);
+        body.set("temperature", options.path("temperature"));
+        body.set("max_tokens", options.path("max_tokens"));
+        boolean thinking = options.path("enable_thinking").asBoolean();
+        if ("dashscope".equals(config.provider)) body.put("enable_thinking", thinking);
+        if ("vllm".equals(config.provider)) body.putObject("chat_template_kwargs").put("enable_thinking", thinking);
+        return new RecognitionChat(address, key, body, options.path("timeout_seconds").asInt(180));
+    }
+
+    public final class RecognitionChat {
+        public final String endpoint;
+        private final String key;
+        private final com.fasterxml.jackson.databind.node.ObjectNode body;
+        private final int timeoutSeconds;
+
+        private RecognitionChat(String endpoint, String key, com.fasterxml.jackson.databind.node.ObjectNode body, int timeoutSeconds) {
+            this.endpoint = endpoint;
+            this.key = key;
+            this.body = body;
+            this.timeoutSeconds = timeoutSeconds;
+        }
+
+        public String requestEvidence() { return probe.redact(body.toString(), key); }
+        public ChatReply execute() { return probe.complete(endpoint, key, body, timeoutSeconds); }
+    }
+
+    public static final class ChatReply {
+        public String requestId, raw, usage, content, errorCode, errorMessage;
+
+        ChatReply fail(String code, String message) {
+            errorCode = code;
+            errorMessage = message;
+            return this;
+        }
+    }
+
     private static Long id(Map<String,Object> row, String name) {
         Object value = row.get(name);
         return value == null ? null : ((Number)value).longValue();
