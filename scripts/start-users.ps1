@@ -13,6 +13,11 @@ $env:CLASSIFIER_DB_PASSWORD=$settings.dbPassword
 $env:CLASSIFIER_ADMIN_LOGIN=$settings.adminLogin
 $env:CLASSIFIER_ADMIN_PASSWORD=$settings.adminPassword
 $env:SERVER_SERVLET_SESSION_COOKIE_NAME="CLASSIFIER_SESSION_$Port"
+$modelAddresses = Join-Path $projectRoot '.local/model-secrets/approved-base-urls.txt'
+if (!$env:CLASSIFIER_MODEL_PRIVATE_BASE_URLS -and (Test-Path -LiteralPath $modelAddresses -PathType Leaf)) {
+    $env:CLASSIFIER_MODEL_PRIVATE_BASE_URLS = ((Get-Content -Encoding UTF8 -LiteralPath $modelAddresses |
+        ForEach-Object { $_.Trim() } | Where-Object { $_ }) -join ',')
+}
 Push-Location $projectRoot
 try {
     New-Item -ItemType Directory -Force 'logs/tmp' | Out-Null

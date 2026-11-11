@@ -10,8 +10,12 @@ function boot(hash = '', storage = new Map()) {
   const node = id => nodes[id] ||= {innerHTML: '', append() {}, remove() {}};
   const location = {hash};
   const window = {location, scrollTo() {}, addEventListener(type, fn) {windowListeners[type] = fn;}};
-  // Knowledge interactions are tested against the live application and MySQL.
-  window.ClassifierKnowledge = {catalog: async () => [], search() {}, mount() {}};
+  // Service-backed pages are exercised against MySQL. These stubs only support the method UI.
+  window.ClassifierKnowledge = {catalog: async () => [{id:'kb-live', name:'学科知识库', defaultVersion:'v1'}],
+    versions: async () => [{number:'v1'}], search() {}, mount() {}};
+  window.ClassifierModelConnections = {options: async () => [
+    {revisionId:61, revisionNo:3, name:'对话连接', modelId:'chat', modelType:'chat'}
+  ], mount() {}, unmount() {}, dismiss() {return false;}};
   window.history = {pushState(_, __, url) {location.hash = url;}, replaceState(_, __, url) {location.hash = url;}};
   const document = {
     querySelector: node,
@@ -23,6 +27,15 @@ function boot(hash = '', storage = new Map()) {
     localStorage: {getItem: key => storage.get(key) || null, setItem: (key, value) => storage.set(key, value)},
     setTimeout() {}, Blob, URL, fetch: async () => ({ok:false})});
   for (const name of ['mock-data.js', 'mock-store.js', 'router.js', 'app.js']) {
+    if (name === 'app.js') {
+      const fixtures = window.ClassifierMockData;
+      window.ClassifierMockData = {...fixtures, seedData() {
+        const data = fixtures.seedData();
+        data.methods[0].kbId = 'kb-live';
+        data.methods[0].draft.knowledgeVersion = 'v1';
+        return data;
+      }};
+    }
     vm.runInContext(fs.readFileSync(path.join(assets, name), 'utf8'), context, {filename: name});
   }
   const event = (type, target) => listeners[type].forEach(fn => fn({target, preventDefault() {}}));
@@ -37,70 +50,79 @@ function boot(hash = '', storage = new Map()) {
   };
 }
 
-const app = boot();
-assert.match(app.html(), /工作台总览/);
-for (const route of ['methods', 'knowledge', 'debug', 'batch', 'settings']) {
-  app.click('nav:' + route);
-  assert.match(app.html(), route === 'knowledge' ? /id="knowledge-page"/ : /class="page-title"/);
+async function run() {
+  const app = boot();
+  await new Promise(setImmediate);
+  assert.match(app.html(), /工作台总览/);
+  for (const route of ['methods', 'knowledge', 'debug', 'batch', 'settings']) {
+    app.click('nav:' + route);
+    assert.match(app.html(), route === 'knowledge' ? /id="knowledge-page"/ : /class="page-title"/);
+  }
+  app.click('methodOpen:m1');
+  assert.match(app.html(), /对话连接 · chat · 修订 3/);
+  for (const stage of ['router', 'recall', 'judge']) app.change('method:' + stage + ':model', '61');
+  app.change('method:router:maxClusters', 6, 'number');
+  app.click('nav:knowledge');
+  assert.match(app.overlay(), /草稿/);
+  app.click('leaveSave');
+  const oldVersion = JSON.stringify(app.saved().methods[0].versions[0]);
+  assert.equal(app.saved().methods[0].draft.config.router.maxClusters, 6);
+  app.click('methodOpen:m1');
+  app.click('methodSaveVersion');
+  app.change('modal:summary', '测试保存新版本');
+  app.click('methodCommitVersion');
+  assert.equal(app.saved().methods[0].versions[0].number, 'v2.4');
+  assert.equal(JSON.stringify(app.saved().methods[0].versions[1]), oldVersion);
+  const bookmarked = app.window.location.hash;
+  assert.match(boot(bookmarked, app.storage).html(), /已保存 v2.4/);
+
+  app.click('methodDebugVersion:v2.3');
+  app.click('dbgSample');
+  app.click('dbgRun');
+  assert.match(app.html(), /0.63/);
+  app.click('dbgSaveHistory');
+  assert.equal(app.saved().histories[0].version, 'v2.3');
+  app.click('dbgAddCandidate');
+  app.click('dbgApplyCandidate');
+  assert.match(app.html(), /待重算/);
+  assert.equal(app.saved().histories[0].adjustments.length, 0);
+  app.click('dbgRestore');
+
+  const legacy = app.saved();
+  legacy.kbs = [{id:'old-mock-knowledge'}];
+  legacy.connections = [{id:'c123', model:'old-demo-model'}];
+  legacy.methods[0].versions[1].config.router.model = 'c123';
+  const legacyStorage = new Map([['direction-classifier.mock.v1', JSON.stringify(legacy)]]);
+  const migrated = boot('#knowledge', legacyStorage).saved();
+  assert.equal(migrated.kbs, undefined);
+  assert.equal(migrated.connections, undefined);
+  assert.equal(migrated.methods[0].versions[1].config.router.model, '');
+  assert.equal(migrated.methods[0].versions[0].config.router.model, '61');
+
+  app.click('nav:batch');
+  app.click('batchNew');
+  app.change('batch:name', '批量演示任务');
+  app.click('batchNext');
+  app.click('batchSample');
+  assert.match(app.html(), /编号重复/);
+  app.change('batch:skipInvalid', true, 'checkbox');
+  app.click('batchNext');
+  app.click('batchSubmit');
+  assert.equal(app.saved().tasks[0].total, 3);
+  app.click('taskSimulate:' + app.saved().tasks[0].id);
+  assert.equal(app.saved().tasks[0].success, 3);
+
+  app.click('nav:settings');
+  assert.match(app.html(), /id="model-connection-page"/);
+  assert.equal(app.saved().connections, undefined);
+  app.route('#methodDetail?methodId=missing');
+  assert.match(app.html(), /管理识别流程/);
+  app.route('#unknown');
+  assert.match(app.html(), /工作台总览/);
+
+  const restored = boot('#debug?dbgMethodId=m1&dbgVersion=v2.3', app.storage);
+  assert.match(restored.html(), /value="v2.3" selected/);
+  boot('', new Map([['direction-classifier.mock.v1', '{invalid']]));
+  console.log('PASS: navigation, versions, draft guard, debug snapshots, legacy data cleanup, batch validation, live model revision selection and storage fallback');
 }
-app.click('methodOpen:m1');
-app.change('method:router:maxClusters', 6, 'number');
-app.click('nav:knowledge');
-assert.match(app.overlay(), /草稿/);
-app.click('leaveSave');
-const oldVersion = JSON.stringify(app.saved().methods[0].versions[0]);
-assert.equal(app.saved().methods[0].draft.config.router.maxClusters, 6);
-app.click('methodOpen:m1');
-app.click('methodSaveVersion');
-app.change('modal:summary', '测试保存新版本');
-app.click('methodCommitVersion');
-assert.equal(app.saved().methods[0].versions[0].number, 'v2.4');
-assert.equal(JSON.stringify(app.saved().methods[0].versions[1]), oldVersion);
-const bookmarked = app.window.location.hash;
-assert.match(boot(bookmarked, app.storage).html(), /已保存 v2.4/);
-
-app.click('methodDebugVersion:v2.3');
-app.click('dbgSample');
-app.click('dbgRun');
-assert.match(app.html(), /0.63/);
-app.click('dbgSaveHistory');
-assert.equal(app.saved().histories[0].version, 'v2.3');
-app.click('dbgAddCandidate');
-app.click('dbgApplyCandidate');
-assert.match(app.html(), /待重算/);
-assert.equal(app.saved().histories[0].adjustments.length, 0);
-app.click('dbgRestore');
-
-const legacyStorage = new Map([['direction-classifier.mock.v1',
-  JSON.stringify({...app.saved(), kbs:[{id:'old-mock-knowledge'}]})]]);
-assert.equal(boot('#knowledge', legacyStorage).saved().kbs, undefined);
-
-app.click('nav:batch');
-app.click('batchNew');
-app.change('batch:name', '批量演示任务');
-app.click('batchNext');
-app.click('batchSample');
-assert.match(app.html(), /编号重复/);
-app.change('batch:skipInvalid', true, 'checkbox');
-app.click('batchNext');
-app.click('batchSubmit');
-assert.equal(app.saved().tasks[0].total, 3);
-app.click('taskSimulate:' + app.saved().tasks[0].id);
-assert.equal(app.saved().tasks[0].success, 3);
-
-app.click('nav:settings');
-app.click('connAdd');
-app.change('modal:name', '本地测试连接');
-app.change('modal:url', 'http://localhost:9999/v1');
-app.change('modal:model', 'mock-model');
-app.click('connSave');
-assert.equal(app.saved().connections.at(-1).model, 'mock-model');
-app.route('#methodDetail?methodId=missing');
-assert.match(app.html(), /管理识别流程/);
-app.route('#unknown');
-assert.match(app.html(), /工作台总览/);
-
-const restored = boot('#debug?dbgMethodId=m1&dbgVersion=v2.3', app.storage);
-assert.match(restored.html(), /value="v2.3" selected/);
-boot('', new Map([['direction-classifier.mock.v1', '{invalid']]));
-console.log('PASS: navigation, bookmarks, versions, draft guard, debug snapshots, legacy knowledge cleanup, batch validation, model connections and storage fallback');
+run().catch(error => { console.error(error); process.exitCode = 1; });

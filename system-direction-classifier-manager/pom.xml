@@ -24,6 +24,10 @@
 			<groupId>cn.edu.whu.irlab.systemdirectionclassifier</groupId>
 			<artifactId>system-direction-classifier-dao</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+		</dependency>
 
 		<!-- 开发组件 -->
 		<dependency>
